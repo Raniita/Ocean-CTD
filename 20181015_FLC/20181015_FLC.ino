@@ -1,18 +1,42 @@
 // Enrique 'Rani'. 16 Julio 2019
-
-// Librarys
+//====================================================================
+//============================= Librarys =============================
+//====================================================================
 #include <mySensor.h>
-#include <SPI.h>
 #include <easy2Time.h>
+#include <SPI.h>
 #include <SD.h>
 #include <avr/pgmspace.h>
+// Probamos la libreria de interrupts del WDT
+#include <LowPower.h>
+
+//====================================================================
+//============================= Configurations =======================
+//====================================================================
+
+/* Configuracion del puerto serie
+ * Baudios -> 9600 o otro diferente
+ * 
+ */
+#define BAUDRATE 9600
 
 // Variables
-#define chipSelect 10
+#define chipSelect 10 // Algo para la SD
 int vbat;
 #define vbatpin A2
 
 // Configuracion de los sensores
+/*
+ * Formato del constructor
+ * sensor(id,sn,readPin,x10pin,x100pin,maxPPB)
+ * 
+ * id -> ID del sensor
+ * sn -> Numero del serie del sensor
+ * readPin -> Pin de lectura
+ * x10pin -> Pin Gain x10
+ * x100pin -> Pin Gain x100
+ * maxPPB -> max de PPB por sensor
+ */
 // SENSOR 1: CDOM
 #define sensor_1Name "CDOM"
 #define id_s 1
@@ -22,7 +46,7 @@ int vbat;
 #define x100pin_s 7
 #define maxPPB_s 1500
 
-//SENSOR 2: Phycoerythin
+// SENSOR 2: Phycoerythin
 #define sensor_2Name "PHY"
 #define id_s2 2 
 #define sn_s2 21180134
@@ -31,25 +55,67 @@ int vbat;
 #define x100pin_s2 9
 #define maxPPB_s2 750
 
-// Declaracion de los sensores
 mySensor sensor1(id_s, sn_s, readPin_s, x10pin_s, x100pin_s, maxPPB_s);
 mySensor sensor2(id_s2, sn_s2, readPin_s2, x10pin_s2, x100pin_s2, maxPPB_s2);
+
+/*
+ * Documentacion de la shield:
+ * https://learn.adafruit.com/adafruit-data-logger-shield/using-the-real-time-clock
+ * 
+ * Idea:
+ *  - Cambiar este reloj a:
+ *  https://aprendiendoarduino.wordpress.com/2016/11/16/arduino-sleep-mode/
+ *  
+ * El 0x68 es la dir I2C del RTC
+ */
 easy2Time reloj(0x68);
 
 // Configuracion SD
 String folderName;
 String fileName;
+
 char option= 'm';
 
 void setup(){
-  Serial.begin(9600);
+  // Configuramos el serial
+  Serial.begin(BAUDRATE);
+  Serial.print(F("Initializated serial conection\n"));
+
+  // Configuramos el RTC
   reloj.begin();
 
+  // Configuramos la SD
   if (!SD.begin(chipSelect)) {
     Serial.println(F("0X01 - CARD IS NOT PRESENT, HALTED, PLEASE CHECK AND REBOOT"));
     // Esperamos hasta que la SD este funcional.
     while(true);
   }
+}
+
+void loop(){
+  /*
+   * Ideas:
+   * Trabajar con interrupts del RTC para captar valores:
+   * Cada vez que salta un interrupt:
+   *  - Mandamos por Serial la hora
+   *  - Obtenemos los datos de cada sensor
+   *  - Comprobamos que las medidas estan dentro de sus valores de ganacia, sino se ajusta dicha ganancia
+   *  - Mandamos o guardamos dichos valores
+   * Con esta solucion lo que obtenemos son mejoras en consumo de bateria, y es mucho más especifico para la captacion de datos.
+   * Podemos hacerlo directamente con el WDT timer, hay que revisar esto.
+   */
+   
+  if(option == 'm') menu();
+  if(option == 's') sampling();
+  if(option == 't') setTime();
+  if(option == 'g') getTime();
+  if(option == 'v') getVbat();
+  if(option == 'f') getSD();
+
+  /*
+   * Para dormir el Arduino 8s
+   */
+   //LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
 }
 
 void start(){ // este metodo genera un fichero nuevo
@@ -66,15 +132,6 @@ void start(){ // este metodo genera un fichero nuevo
   //dataFile.print(F("Date\tTime\t"));
   Serial.print((F("Date\tTime\tCDOM-ppb\tCDOM-gain\tCDOM-mv\tPHY-ppb\tPHY-gain\tPHY-mv\n")));  
  }
-
-void loop(){
-  if(option == 'm') menu();
-  if(option == 's') sampling();
-  if(option == 't') setTime();
-  if(option == 'g') getTime();
-  if(option == 'v') getVbat();
-  if(option == 'f') getSD();
-}
 
 void getVbat(){
   Serial.print("$bat$");
