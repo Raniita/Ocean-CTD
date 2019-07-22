@@ -1,0 +1,22 @@
+#######################################
+# Syntax Coloring Map For cyclopSensor
+#######################################
+ 
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+ 
+cyclopSensor KEYWORD1
+ 
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+ 
+measure KEYWORD2
+convert2ppb KEYWORD2
+ 
+#######################################
+# Constants (LITERAL1)
+#######################################
+#ON LITERAL1    
+#OFF LITERAL1   
