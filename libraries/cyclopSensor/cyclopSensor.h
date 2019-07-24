@@ -10,6 +10,7 @@ class cyclopSensor {
 		
 		//func
 		double measure(), measure(bool ppb), convert2ppb(double measure);
+		int getGain();
 		
 	private:
 		//vars
@@ -18,6 +19,8 @@ class cyclopSensor {
 		double maxPPB, maxMV;
 		uint32_t sn;
 		int switchDelay, lastValue, value;
+		bool controlled;
+		
 		//func
 		double map_double(double x, double in_min, double in_max, double out_min, double out_max);
 		void adjustGain();

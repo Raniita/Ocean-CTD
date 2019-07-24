@@ -22,8 +22,9 @@ cyclopSensor::cyclopSensor(byte mId, uint32_t mSN, byte mPin, byte mx10, byte mx
 	maxPPB = mMaxPPB;
 	
 	maxMV = 5000; 		   // mV maximos segun las especs
-	switchDelay = 1500; 	// In seconds
-	gain = 1; 
+	switchDelay = 2500; 	// In seconds
+	gain = 1;
+	controlled = false;
 	
 	// Declarations of I/O
 	pinMode(pin, INPUT);   // Pin de lectura del sensor
@@ -39,8 +40,8 @@ cyclopSensor::cyclopSensor(byte mId, uint32_t mSN, byte mPin, byte mx10, byte mx
 	
 	// Configuracion default para las lecturas
 	// Default x10 ya que es el tipo más frecuente
-	digitalWrite(x10, HIGH);
-	digitalWrite(x100, LOW);
+	digitalWrite(x10, LOW);
+	digitalWrite(x100, HIGH);
 	gain = 10;
 }
 
@@ -52,33 +53,52 @@ void cyclopSensor::adjustGain(){
 	// Muestro del ultimo valor
 	lastValue = map(analogRead(pin),0,1023,0, maxMV);
 	
-	// Check value
-	if(gain == 1 && lastValue < 499){
-		// Cambiamos a 10
-		digitalWrite(x10, LOW);
-		digitalWrite(x100, HIGH);
-		gain = 10;
-		delay(switchDelay);
-	} else if(gain == 10 && lastValue < maxMV - 1){
-		// Cambiamos a 100
-		digitalWrite(x10, HIGH);
-		digitalWrite(x100, LOW);
-		gain = 100;
-		delay(switchDelay);
-	} else if(gain == 100 && lastValue < maxMV - 1){
-		// Cambiamos a 10
-		digitalWrite(x10, LOW);
-		digitalWrite(x100, HIGH);
-		gain = 10;
-		delay(switchDelay);
-	} else if(gain == 10 && lastValue < maxMV - 1){
-		// Cambiamos a 1;
-		digitalWrite(x10, HIGH);
-		digitalWrite(x100, HIGH);
-		gain = 1;
-		delay(switchDelay);
+	// Autoadjust gain
+	if(gain == 1){
+	    // Gain at x1
+	    digitalWrite(x10, HIGH);
+	    digitalWrite(x100, HIGH);
+	    
+	    if(lastValue < 300){
+	        // Switch to x10
+	        gain = 10;
+	        digitalWrite(x10, LOW);
+	        digitalWrite(x100, HIGH);
+	    }
+	}
+	 
+	if(gain == 10){
+	    // Gain at x10
+	    digitalWrite(x10, LOW);
+	    digitalWrite(x100, HIGH);
+	        
+	    if(lastValue < 300){
+	        // Switch to x100
+	        gain = 100;
+	        digitalWrite(x10, HIGH);
+	        digitalWrite(x100, LOW);
+	    } else if(lastValue > maxMV - 500){
+	        // Switch to x1
+	        gain = 1;
+	        digitalWrite(x10, HIGH);
+	        digitalWrite(x100, HIGH);
+	    }
 	}
 	
+	if(gain == 100){
+	    // Gain at x100
+	    digitalWrite(x10, HIGH);
+	    digitalWrite(x100, LOW);
+	        
+	    if(lastValue > maxMV - 500){
+	        // Switch to x10
+	        gain = 10;
+	        digitalWrite(x10, LOW);
+	        digitalWrite(x100, HIGH);
+	    }
+	}
+	
+	delay(switchDelay);
 }
 
 double cyclopSensor::measure(){
@@ -89,6 +109,7 @@ double cyclopSensor::measure(){
 double cyclopSensor::measure(bool ppb){
 	adjustGain();
 	value = map(analogRead(pin), 0, 1023, 0, maxMV);
+	
 	if(ppb == true){
 		// Convertimos a ppb
 		value = map_double(analogRead(pin), 0, 1023, 0, maxPPB/(int)gain);
@@ -101,4 +122,8 @@ double cyclopSensor::measure(bool ppb){
 double cyclopSensor::convert2ppb(double measure){
 	// Hay que preguntar
 	return measure;
+}
+
+int cyclopSensor::getGain(){
+    return gain;
 }

@@ -46,7 +46,7 @@
 #define x100_2 9
 #define maxPPB_2 750
 
-cyclopSensor cdom(id_1, sn_1, readPin_1, x10_1, x100_1, maxPPB_1);
+//cyclopSensor cdom(id_1, sn_1, readPin_1, x10_1, x100_1, maxPPB_1);
 cyclopSensor phy(id_2, sn_2, readPin_2, x10_2, x100_2, maxPPB_2);
 
 void setup(){
@@ -55,12 +55,16 @@ void setup(){
 }
 
 void loop(){
+  delay(200);
+
+  Serial.println(F("Measuring..."));
 	// Taking measures
-	String cdom_measure = (String) cdom.measure();
+	//String cdom_measure = (String) cdom.measure();
 	String phy_measure = (String) phy.measure();	
-	Serial.println("Value of CDOM: " + cdom_measure);
-	Serial.println("Value of PHY: " + phy_measure);
+	//Serial.println("Value of CDOM: " + cdom_measure);
+	Serial.println("PHY: " + phy_measure);
+  Serial.println("Gain: " + (String) phy.getGain() + "\n");
 	
 	// Sleep arduino
-	LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);	
+	LowPower.powerDown(SLEEP_2S, ADC_OFF, BOD_OFF);	
 }
