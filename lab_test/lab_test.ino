@@ -1,10 +1,10 @@
-// Enrique 'Rani'. 22 Julio 2019
+// Enrique 'Rani'. 25 Octubre 2019
 //====================================================================
 //============================= Librarys =============================
 //====================================================================
 #include <cyclopSensor.h>
 #include <avr/pgmspace.h>
-#include <LowPower.h>
+//#include <LowPower.h>
 
 //====================================================================
 //============================= Configurations =======================
@@ -14,7 +14,7 @@
  * Baudios -> 9600 o otro diferente
  * 
  */
-#define BAUDRATE 9600
+#define BAUDRATE 115200
 
 // Configuracion de los sensores
 /*
@@ -28,43 +28,62 @@
  * x100pin -> Pin Gain x100
  * maxPPB -> max de PPB por sensor
  */
-// SENSOR 1: CDOM
-#define sensor_name_1 "CDOM"
-#define id_1 1
-#define sn_1 21180135
-#define readPin_1 A0
-#define x10_1 6
-#define x100_1 7
-#define maxPPB_1 1500
+// Sensor 1: CDOM
+#define cdom_type "cdom"
+#define cdom_id 1
+#define cdom_readPin A0
+#define cdom_x10Pin 6
+#define cdom_x100Pin 7
+#define cdom_maxPPB 1500
 
-// SENSOR 2: Phycoerythin
-#define sensor_name_2 "PHY"
-#define id_2 2 
-#define sn_2 21180134
-#define readPin_2 A1
-#define x10_2 8
-#define x100_2 9
-#define maxPPB_2 750
+// Sensor 2: Phycoerythin
+#define phy_type "phy"
+#define phy_id 2 
+#define phy_readPin A1
+#define phy_x10Pin 8
+#define phy_x100Pin 9
+#define phy_maxPPB 750
 
-//cyclopSensor cdom(id_1, sn_1, readPin_1, x10_1, x100_1, maxPPB_1);
-cyclopSensor phy(id_2, sn_2, readPin_2, x10_2, x100_2, maxPPB_2);
+cyclopSensor cdom(cdom_id, cdom_readPin, cdom_x10Pin, cdom_x100Pin);
+cyclopSensor phy(phy_id, phy_readPin, phy_x10Pin, phy_x100Pin);
 
 void setup(){
-	Serial.begin(BAUDRATE);
-	Serial.println(F("Initialized serial conection \n"));
+  // Configuramos el puerto serie
+  Serial.begin(BAUDRATE);
+	Serial.println(F("Initialized serial conection"));
+  delay(50);
+
+  Serial.println(F("Cyclops configuration: "));
+  // Configuramos los sensores
+  cdom.setMaxPPB(cdom_maxPPB);
+  Serial.println("CDOM at PPB: " + (String) cdom.getMaxPPB());
+  phy.setMaxPPB(phy_maxPPB);
+  Serial.println("PHY at PPB: " + (String) phy.getMaxPPB());
+
+  Serial.println("CDOM Gain: x" + (String) cdom.getGain());
+  Serial.println("Phy Gain: x" + (String) phy.getGain());
+
+  // Antes de entrar al loop
+  Serial.println(" ");
+  delay(2000);
 }
 
 void loop(){
-  delay(200);
+  delay(1500);
 
-  Serial.println(F("Measuring..."));
-	// Taking measures
-	//String cdom_measure = (String) cdom.measure();
-	String phy_measure = (String) phy.measure();	
-	//Serial.println("Value of CDOM: " + cdom_measure);
-	Serial.println("PHY: " + phy_measure);
-  Serial.println("Gain: " + (String) phy.getGain() + "\n");
-	
+  // Taking measures
+  Serial.println(F("\nMeasuring..."));
+  // sample() --> Version antigua de tomar medidas. Valor directo
+  // measure() --> Mi implementacion. No da el valor directo
+	String cdom_measure = (String) cdom.sample();
+	String cdom_gain = (String) cdom.getGain();
+	String phy_measure = (String) phy.sample();
+  String phy_gain = (String) phy.getGain();	
+
+  // Printing values on Serial
+	Serial.println("CDOM => x" + cdom_gain + " value: " + cdom_measure);
+  Serial.println("Phyto => x" + phy_gain + " value: " + phy_measure);
+
 	// Sleep arduino
-	LowPower.powerDown(SLEEP_2S, ADC_OFF, BOD_OFF);	
+	//LowPower.powerDown(SLEEP_2S, ADC_OFF, BOD_OFF);	
 }

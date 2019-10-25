@@ -1,5 +1,3 @@
-#include <LowPower.h>
-
 // Definimos el sensor
 // En este caso utilizamos el sensor de phyto
 #define sensor_name_1 "PHY"

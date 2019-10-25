@@ -5,24 +5,25 @@
 class cyclopSensor {
 	public:
 		// Constructor
-		cyclopSensor(byte mId, uint32_t mSN, byte mPin, byte mx10, byte x100, double mMaxPPB);
+		cyclopSensor(byte mId, byte mPin, byte mx10, byte x100);
 		//vars
 		
 		//func
-		double measure(), measure(bool ppb), convert2ppb(double measure);
-		int getGain();
-		
+		double sample(), measure(), measure(bool autogain), measure(bool autogain, bool ppb), convert2ppb(double measure);
+		int getMaxPPB(), getGain();
+		void setMaxPPB(double mPPB), setGain(uint8_t mGain);
+
 	private:
 		//vars
-		byte id, pin, x10, x100;
-		int gain;
+		uint8_t id, pin, x10, x100, gain;
 		double maxPPB, maxMV;
-		uint32_t sn;
-		int switchDelay, lastValue, value;
+		//char sn[];
+		uint16_t switchDelay, lastValue, value;
 		bool controlled;
-		
+
 		//func
 		double map_double(double x, double in_min, double in_max, double out_min, double out_max);
-		void adjustGain();
+		void autoGain(), adjustGain(), switchGain(uint8_t mGain);
 };
+
 #endif
