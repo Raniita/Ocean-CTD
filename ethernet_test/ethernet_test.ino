@@ -3,6 +3,8 @@
 //====================================================================
 #include <avr/pgmspace.h>
 #include <SPI.h>
+
+// Ethernet3 Librarys
 #include <Ethernet3.h>
 #include <EthernetClient.h>
 #include <EthernetServer.h>
@@ -14,8 +16,12 @@
 
 #define BAUDRATE 115200
 
+// Ethernet shield tiene la SD en el 4
+#define sd_pin 4
+
 // IP Configs
 // Cliente
+#define hostname "upct_ctd"
 byte mac[6] = { 0x90, 0xA2, 0xDA, 0x2A, 0xB8, 0xCE };
 IPAddress ip(10, 0, 0, 240);
 IPAddress gw(10, 0, 0, 1);
@@ -40,14 +46,15 @@ void setup() {
   Serial.begin(BAUDRATE);
   Serial.println(F("Initializated serial connection"));
 
-  pinMode(4, OUTPUT);
-  digitalWrite(4, HIGH);
+  pinMode(sd_pin, OUTPUT);
+  digitalWrite(sd_pin, HIGH);
 
-  Ethernet.macAddress(mac);
+  //Ethernet.macAddress(mac);
+  Ethernet.setHostname(hostname);
   Ethernet.begin(mac, ip, subnet, gw);
   delay(3500);
   
-  //udp.begin(local_port);
+  udp.begin(local_port);
 
   Serial.println("");
   delay(2000);
