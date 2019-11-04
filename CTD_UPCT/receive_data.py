@@ -1,8 +1,8 @@
 import socket
 
 # Aqui iria la ip del arduino
-udp_ip = "127.0.0.1"
-udp_port = 55055
+udp_ip = "10.0.0.247"
+udp_port = 45045
 
 buffersize = 1024
 

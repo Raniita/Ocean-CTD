@@ -235,5 +235,4 @@ void send_message(String msg)
   udp.beginPacket(ip_server, server_port);
   udp.print(msg);
   udp.endPacket();
-  delay(500);
 }
