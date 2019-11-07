@@ -1,17 +1,15 @@
-import socket
+import socket, time
 
-# Aqui iria la ip del arduino
-udp_ip = "10.0.0.247"
-udp_port = 45045
-
+address = ('10.0.0.127', 55055)
 buffersize = 1024
 
 # Creates UDP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-# Bind to the socket
-sock.bind((udp_ip, udp_port))
+sock.bind(("", 45045))
 
 while True:
-    data, addr = sock.recvfrom(buffersize)
-    print("received message: ", data.decode('utf-8'))
+    msg = "hola"
+    sock.sendto(msg.encode(), address)
+
+    data, ip = sock.recvfrom(1024)
+    print("{}:{}".format(ip, data.decode()))

@@ -4,11 +4,9 @@
 #include <avr/pgmspace.h>
 #include <SPI.h>
 
-// Ethernet3 Librarys
-#include <Ethernet3.h>
-#include <EthernetClient.h>
-#include <EthernetServer.h>
-#include <EthernetUdp3.h>
+// Ethernet Librarys (w5100 == Ethernet, w5500 == Ethernet, Ethernet3) 
+#include <Ethernet.h>
+#include <EthernetUdp.h>
 
 //====================================================================
 //============================= Librarys =============================
@@ -20,13 +18,13 @@
 #define sd_pin 4
 
 // IP Configs
-// Cliente
-#define hostname "upct_ctd"
 byte mac[6] = { 0x90, 0xA2, 0xDA, 0x2A, 0xB8, 0xCE };
-IPAddress ip(10, 0, 0, 240);
-IPAddress gw(10, 0, 0, 1);
-IPAddress subnet(255, 255, 255, 0);
 unsigned int local_port = 55055;
+
+// Static Config
+IPAddress ip(192, 168, 0, 210);
+IPAddress gw(192, 168, 0, 1);
+IPAddress subnet(255, 255, 255, 0);
 
 // Server
 IPAddress ip_server(10, 0, 0, 126);
@@ -49,11 +47,23 @@ void setup() {
   pinMode(sd_pin, OUTPUT);
   digitalWrite(sd_pin, HIGH);
 
-  //Ethernet.macAddress(mac);
-  Ethernet.setHostname(hostname);
-  Ethernet.begin(mac, ip, subnet, gw);
-  delay(3500);
+  Serial.println("Initialize Ethernet with DHCP:");
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+      Serial.println("Ethernet shield was not found.  Sorry, can't run without hardware. :(");
+    } else if (Ethernet.linkStatus() == LinkOFF) {
+      Serial.println("Ethernet cable is not connected.");
+    }
+    // no point in carrying on, so do nothing forevermore:
+    while (true) {
+      delay(1);
+    }
+  }
   
+  Serial.print("My IP address: ");
+  Serial.println(Ethernet.localIP());
+
   udp.begin(local_port);
 
   Serial.println("");
@@ -61,19 +71,27 @@ void setup() {
 }
 
 void loop() {
-  // Funciones test ethernet3
-  Serial.println(Ethernet.macAddressReport()); 
-  Serial.println(Ethernet.phyState());
-  Serial.println(Ethernet.link());
-  Serial.println(Ethernet.linkReport());
-  Serial.println(Ethernet.localIP());
+  packetSize = udp.parsePacket();
+
+  if(packetSize > 0){
+    udp.read(packetBuffer, UDP_TX_PACKET_MAX_SIZE);
+    String datReq(packetBuffer);
+
+    if(datReq == "hola"){
+      send_message("quetal");
+    }
+
+    if(datReq == "adios"){
+      send_message("adios");
+    }
+  }
   
   //send_message("cdom;10;34;3000");
   //delay(1000);
 }
 
 void send_message(String msg){
-  Serial.println("Printing: " + msg);
+  Serial.println("Sending: " + msg);
   udp.beginPacket(ip_server, server_port);
   udp.print(msg);
   udp.endPacket();
