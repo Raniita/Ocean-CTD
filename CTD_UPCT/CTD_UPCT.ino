@@ -217,7 +217,7 @@ void read_sensor(String mSensor){
 }
 
 void send_message(String msg){
-  udp.beginPacket(ip_server, server_port);
+  udp.beginPacket(udp.remoteIP(), udp.remotePort());
   udp.print(msg);
   udp.endPacket();
 
