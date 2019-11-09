@@ -13,10 +13,9 @@ cyclopSensor KEYWORD1
 #######################################
  
 measure KEYWORD2
+sample KEYWORD2
 convert2ppb KEYWORD2
  
 #######################################
 # Constants (LITERAL1)
-#######################################
-#ON LITERAL1    
-#OFF LITERAL1   
+#######################################  
