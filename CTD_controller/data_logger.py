@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from datetime import date
 import socket, time, csv
 
@@ -5,10 +7,12 @@ import socket, time, csv
 arduino = ('10.0.0.20', 55055)
 buffersize = 1024
 
-station = input("Please introduce name of current station: ")
+#station = input("Please introduce name of current station: ")
+station = 'e1'
+start_timestamp = date.today().strftime("%Y-%m-%d-%H:%M:%S")
 
-filename = "-".join((date.today(),station,".csv"))
-log_filename = "-".join((date.today(),station,".log"))
+filename = "-".join((start_timestamp,station,".csv"))
+log_filename = "-".join((start_timestamp,station,".log"))
 
 # UPD Socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -51,6 +55,7 @@ while True:
         cdom_mv = data[3]
     
     except:
+        print("Error reading cdom")
         pass
     
     time.sleep(1)
@@ -65,6 +70,7 @@ while True:
         phy_mv = data[3]
 
     except:
+        print("Error reading phy")
         pass
 
     time.sleep(1)
@@ -79,6 +85,7 @@ while True:
         chl_mv = data[3]
 
     except:
+        print("Error reading chl")
         pass
 
     time.sleep(1)
@@ -89,3 +96,7 @@ while True:
         recv_d, addr = sock.recvfrom(buffersize)
         data = recv_d.split(";")
         temp2 = data[1]
+
+    except:
+        print("Error reading temp")
+        pass
