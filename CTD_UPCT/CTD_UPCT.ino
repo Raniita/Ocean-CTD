@@ -11,10 +11,10 @@
 #include <SPI.h>
 
 // Ethernet Librarys (w5100 == Ethernet, w5500 == Ethernet, Ethernet3) 
-#include <Ethernet.h>
-#include <EthernetUdp.h>
-//#include <Ethernet3.h>
-//#include <EthernetUdp3.h>
+//#include <Ethernet.h>
+//#include <EthernetUdp.h>
+#include <Ethernet3.h>
+#include <EthernetUdp3.h>
 
 //====================================================================
 //============================= Configurations =======================
@@ -24,25 +24,28 @@
 #define BAUDRATE 115200
 
 // Cyclops Sensors
+// Plateado
 #define cdom_type "cdom"
 #define cdom_id "1"
-#define cdom_read A0
-#define cdom_x10 9
-#define cdom_x100 8
+#define cdom_read A1
+#define cdom_x10 6
+#define cdom_x100 5
 #define cdom_maxPPB 1500
 
+// Negro
 #define phy_type "phy"
 #define phy_id "2"
-#define phy_read A1
-#define phy_x10 7
-#define phy_x100 6
+#define phy_read A0
+#define phy_x10 8
+#define phy_x100 7
 #define phy_maxPPB 750
 
+// Amarillo
 #define chl_type "chl"
 #define chl_id "3"
 #define chl_read A2
-#define chl_x10 5
-#define chl_x100 3
+#define chl_x10 3
+#define chl_x100 2
 #define chl_maxPPB 500
 
 // Ethernet shield tiene la SD en el 4
