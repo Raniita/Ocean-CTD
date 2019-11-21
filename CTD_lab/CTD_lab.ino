@@ -5,14 +5,13 @@
 #include <TSYS01.h>
 #include <MS5837.h>
 #include <cyclopSensor.h>
-//#include <LowPower.h>
 
 #include <Wire.h>
 #include <SPI.h>
 
 // Ethernet Librarys (w5100 == Ethernet, w5500 == Ethernet, Ethernet3) 
-#include <Ethernet.h>
-#include <EthernetUdp.h>
+//#include <Ethernet.h>
+//#include <EthernetUdp.h>
 //#include <Ethernet3.h>
 //#include <EthernetUdp3.h>
 
@@ -52,24 +51,24 @@
 #define sd_pin 4
 
 // Local configs
-#define hostname "upct_ctd"
-byte mac[6] = { 0x90, 0xA2, 0xDA, 0x2A, 0xB8, 0xCE };
-unsigned int local_port = 55055;
+//#define hostname "upct_ctd"
+//byte mac[6] = { 0x90, 0xA2, 0xDA, 0x2A, 0xB8, 0xCE };
+//unsigned int local_port = 55055;
 
 // IP Static config
-IPAddress ip(10, 0, 1, 10);
-IPAddress gw(10, 0, 1, 1);
-IPAddress my_dns(1, 1, 1, 1);
-IPAddress subnet(255, 255, 255, 0);
+//IPAddress ip(192, 168, 1, 177);
+//IPAddress gw(192, 168, 1, 1);
+//IPAddress my_dns(1, 1, 1, 1);
+//IPAddress subnet(255, 255, 255, 0);
 
 // IP + Port Server
-IPAddress ip_server(192, 168, 1, 5);
-unsigned int server_port = 45045;
+//IPAddress ip_server(192, 168, 1, 5);
+//unsigned int server_port = 45045;
 
 // UDP configs
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE];
-String datReq;  //String for our data
-int packetSize; //Size of the packet
+//char packetBuffer[UDP_TX_PACKET_MAX_SIZE];
+//String datReq;  //String for our data
+//int packetSize; //Size of the packet
 
 //====================================================================
 //============================= Definitions ==========================
@@ -91,9 +90,9 @@ MS5837 presion;
 TSYS01 temp;
 
 // Utilidades
-EthernetUDP udp;
+//EthernetUDP udp;
 
-void setup(){
+void setup() {
   Serial.begin(BAUDRATE);
   Serial.println(F("Initializated serial connection"));
   delay(300);
@@ -121,48 +120,20 @@ void setup(){
   presion.setModel(MS5837::MS5837_30BA);
   presion.setFluidDensity(1029); // kg/m^3 (freshwater, 1029 for seawater)
 
-  // Configuracion Ethernet
-  Serial.println(F("Initialize Ethernet with DHCP:")); 
-  // Static w5100
-  //Ethernet.begin(mac, ip, my_dns, gw, subnet); 
-  
-  // Static w5500 (Ethernet3)
-  //Ethernet.begin(mac, ip, subnet, gw);
-  
-  if(Ethernet.begin(mac) == 0){
-    Serial.println(F("Error on Ethernet. Not booting."));
-    while(true){
-      delay(1);
-    }
-  }
-  
-  delay(1500);
-
-  udp.begin(local_port);
-  Serial.print("IP: ");
-  Serial.println(Ethernet.localIP());
-  //Serial.println(" port: " + local_port);
-  //Serial.println("IP: " + Ethernet.localIP() + " port: " + local_port);
-  //Serial.println("IP Server: " + ip_server + " port: " + server_port);
+  Serial.print("Ready to receive incoming commands: ");
 
   Serial.println("");
   delay(2000);
 }
 
-void loop(){
-  packetSize = udp.parsePacket();
-
-  if (packetSize > 0){
-    udp.read(packetBuffer, UDP_TX_PACKET_MAX_SIZE); 
-    datReq = packetBuffer;
-
-    Serial.println("Received: " + datReq);
+void loop() {
+  if (Serial.available() > 0) {
+    String datReq = Serial.readString();
     
-    // Mandamos lo recibido a la funcion
-    // Si es alguno de nuestros sensores, mandamos la medida
-    // Si no es, no hacemos nada
+    // Mandamos lo que hemos leido a la funcion
     read_sensor(datReq);
-  } 
+  }
+
 }
 
 void read_sensor(String mSensor){
@@ -171,7 +142,7 @@ void read_sensor(String mSensor){
   // <type>;<pressure>;<temp>;<depth>;<altitude>
   // <type>;<measure> (i2c sensors)
   
-  if(mSensor == "cdom"){
+  if(mSensor.equals("cdom")){
     cdom_measure = (String) cdom.sample();
     cdom_mv = (String) cdom.measure();
     cdom_gain = (String) cdom.getGain();
@@ -181,7 +152,7 @@ void read_sensor(String mSensor){
     send_message(message);
   }
 
-  if(mSensor == "phy"){
+  if(mSensor.equals("phy")){
     phy_measure = (String) phy.sample();
     phy_mv = (String) phy.measure();
     phy_gain = (String) phy.getGain();
@@ -191,7 +162,7 @@ void read_sensor(String mSensor){
     send_message(message);
   }
 
-  if(mSensor == "chl"){
+  if(mSensor.equals("chl")){
     chl_measure = (String) chl.sample();
     chl_mv = (String) chl.measure();
     chl_gain = (String) chl.getGain();
@@ -201,7 +172,7 @@ void read_sensor(String mSensor){
     send_message(message);
   }
 
-  if(mSensor == "ms5"){
+  if(mSensor.equals("ms5")){
     presion.read();
     ms_pressure = (String) presion.pressure();
     ms_temp = (String) presion.temperature();
@@ -214,7 +185,7 @@ void read_sensor(String mSensor){
     send_message(message);
   }
 
-  if(mSensor == "temp"){
+  if(mSensor.equals("temp")){
     temp.read();
     ts_temp = (String) temp.temperature();
 
@@ -225,11 +196,5 @@ void read_sensor(String mSensor){
 }
 
 void send_message(String msg){
-  udp.beginPacket(udp.remoteIP(), udp.remotePort());
-  udp.print(msg);
-  udp.endPacket();
-
-  delay(200);
-  memset(packetBuffer, 0, UDP_TX_PACKET_MAX_SIZE);
-  delay(200);
+  Serial.println(msg);  
 }
