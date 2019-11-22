@@ -24,7 +24,7 @@ csv_writer.writerow(["station", "date", "depth", "var1", "var2", "var3"])
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(("", 45045))
 
-sock.settimeout(3)  # 1 sec timeout
+sock.settimeout(2)  # 1 sec timeout
 
 print("Receiving data: ... \n")
 
@@ -39,13 +39,13 @@ while True:
     sock.sendto(msg2send.encode(), arduino)
     try:
         recv_d, addr = sock.recvfrom(buffersize)
-        data = recv_d.split(";")
+        data = recv_d.decode().split(";")
         pressure = data[1]
         temp1 = data[2]
         depth = data[3]
         altitude = data[4]
 
-        print("[MS5] Depth: %f Pressure: %f Altitude: %f Temp: %f", depth, pressure, altitude, temp1)
+        print(f"[MS5] Depth: {depth} Pressure: {pressure} Altitude: {altitude} Temp: {temp1}")
 
         # Save log files
 
@@ -57,18 +57,18 @@ while True:
         print("Error on ms5")
         pass
 
-    time.sleep(1)   # little delay until the next command
+    time.sleep(2)   # little delay until the next command
 
     msg2send = "cdom"
     sock.sendto(msg2send.encode(), arduino)
     try:
         recv_d, addr = sock.recvfrom(buffersize)
-        data = recv_d.split(";")
+        data = recv_d.decode().split(";")
         cdom_gain = data[1]
         cdom_ppb = data[2]
         cdom_mv = data[3]
 
-        print("[CDOM] Gain: %f PPB: %f mV: %f", cdom_gain, cdom_ppb, cdom_mv)
+        print(f"[CDOM] Gain: {cdom_gain} PPB: {cdom_ppb} mV: {cdom_mv}")
 
         # Save to log files
 
@@ -80,18 +80,18 @@ while True:
         print("Error reading cdom")
         pass
     
-    time.sleep(1)
+    time.sleep(2)
 
     msg2send = "phy"
     sock.sendto(msg2send.encode(), arduino)
     try:
         recv_d, addr = sock.recvfrom(buffersize)
-        data = recv_d.split(";")
+        data = recv_d.decode().split(";")
         phy_gain = data[1]
         phy_ppb = data[2]
         phy_mv = data[3]
 
-        print("[PHY] Gain: %f PPB: %f mV: %f", phy_gain, phy_ppb, phy_mv)
+        print(f"[PHY] Gain: {phy_gain} PPB: {phy_ppb} mV: {phy_mv}")
 
         # Save to log files
 
@@ -103,18 +103,18 @@ while True:
         print("Error reading phy")
         pass
 
-    time.sleep(1)
+    time.sleep(2)
 
     msg2send = "chl"
     sock.sendto(msg2send.encode(), arduino)
     try:
         recv_d, addr = sock.recvfrom(buffersize)
-        data = recv_d.split(";")
+        data = recv_d.decode().split(";")
         chl_gain = data[1]
         chl_ppb = data[2]
         chl_mv = data[3]
 
-        print("[CHL] Gain: %f PPB: %f mV: %f", chl_gain, chl_ppb, chl_mv)
+        print(f"[CHL] Gain: {chl_gain} PPB: {chl_ppb} mV: {chl_mv}")
 
         # Save to log files
 
@@ -126,16 +126,16 @@ while True:
         print("Error reading chl")
         pass
 
-    time.sleep(1)
+    time.sleep(2)
 
     msg2send = "temp"
     sock.sendto(msg2send.encode(), arduino)
     try:
         recv_d, addr = sock.recvfrom(buffersize)
-        data = recv_d.split(";")
+        data = recv_d.decode().split(";")
         temp2 = data[1]
 
-        print("[Temp] temp2: %f", temp2)
+        print(f"[Temp] temp2: {temp2}")
 
         # Save to log files
 
@@ -149,6 +149,6 @@ while True:
 
     if(ms5_read == True and cdom_read == True and phy_read == True and chl_read == True and temp_read == True):
         # Write to CSV
-        csv_writer.writer([station, date, depth, cdom_ppb, phy_read, chl_read])
+        csv_writer.writerow([station, date, depth, cdom_ppb, phy_ppb, chl_ppb])
     else:
         print("Unable to save on csv.")

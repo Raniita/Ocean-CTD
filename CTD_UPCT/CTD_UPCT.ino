@@ -157,6 +157,7 @@ void loop(){
     datReq = packetBuffer;
 
     Serial.println("Received: " + datReq);
+    memset(packetBuffer, 0, UDP_TX_PACKET_MAX_SIZE);
     
     // Mandamos lo recibido a la funcion
     // Si es alguno de nuestros sensores, mandamos la medida
