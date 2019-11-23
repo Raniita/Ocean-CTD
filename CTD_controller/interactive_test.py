@@ -1,7 +1,8 @@
 import socket, time
 
 # IP del arduino + puerto arduinos
-address = ('10.0.0.127', 55055)
+# Con el mini router => 10.0.1.10 o probe.lan
+address = ('10.0.1.10', 55055)
 buffersize = 1024
 
 # Creates UDP socket

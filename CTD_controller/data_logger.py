@@ -3,13 +3,13 @@ from datetime import datetime
 import socket, time, csv
 
 # Arduino IP + port
-arduino = ('10.0.0.127', 55055)
+arduino = ('10.0.1.10', 55055)
 buffersize = 1024
 
 #station = input("Please introduce name of current station: ")
 station = 'e1'
 date = datetime.today().strftime("%Y-%m-%d")
-start_timestamp = datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
+start_timestamp = datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
 
 filename = "".join((start_timestamp,station,".csv"))
 log_filename = "".join((start_timestamp,station,"_log.csv"))
