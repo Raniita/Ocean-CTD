@@ -90,6 +90,9 @@ String message;
 MS5837 presion;
 TSYS01 temp;
 
+bool presion_fail = false;
+int retry;
+
 // Utilidades
 EthernetUDP udp;
 
@@ -110,16 +113,6 @@ void setup(){
   Serial.println("CDOM Gain: x" + (String) cdom.getGain());
   Serial.println("Phy Gain: x" + (String) phy.getGain());
   Serial.println("CHL Gain: x" + (String) chl.getGain());
-
-  // Configuracion I2C sensors
-  Wire.begin();
-  temp.init();
-  while (!presion.init()){
-    Serial.println(F("Presion sensor failed"));
-    delay(2000);
-  }
-  presion.setModel(MS5837::MS5837_30BA);
-  presion.setFluidDensity(1029); // kg/m^3 (freshwater, 1029 for seawater)
 
   // Configuracion Ethernet
   Serial.println(F("Initialize Ethernet with DHCP:")); 
@@ -145,6 +138,26 @@ void setup(){
   //Serial.println("IP: " + Ethernet.localIP() + " port: " + local_port);
   //Serial.println("IP Server: " + ip_server + " port: " + server_port);
 
+  // Configuracion I2C sensors
+  Wire.begin();
+  temp.init();
+  while (!presion.init()){
+    if(retry > 10) {
+      presion_fail = true;
+      break;
+    } else {
+      retry++;
+    }
+
+    Serial.println(F("Presion sensor failed"));
+    delay(2000);
+  }
+  
+  if(presion_fail = false){
+    presion.setModel(MS5837::MS5837_30BA);
+    presion.setFluidDensity(1029); // kg/m^3 (1029 for seawater)
+  }
+  
   Serial.println("");
   delay(2000);
 }
@@ -203,16 +216,24 @@ void read_sensor(String mSensor){
   }
 
   if(mSensor == "ms5"){
-    presion.read();
-    ms_pressure = (String) presion.pressure();
-    ms_temp = (String) presion.temperature();
-    ms_depth = (String) presion.depth();
-    ms_alt = (String) presion.altitude();
+    if(presion_fail = true){
+      // Presion sensor doesnt boot. ERROR
+      message = "ms5;error";
+      Serial.println("MS5837 => Error, sensor doesnt boot");
 
-    message = "ms5;" + ms_pressure + ";" + ms_temp + ";" + ms_depth + ";" + ms_alt;
-    Serial.println("MS5837 => " + ms_pressure + " mbar, " + ms_temp + " C, " +
+       send_message(message);
+    } else {
+      presion.read();
+      ms_pressure = (String) presion.pressure();
+      ms_temp = (String) presion.temperature();
+      ms_depth = (String) presion.depth();
+      ms_alt = (String) presion.altitude();
+
+      message = "ms5;" + ms_pressure + ";" + ms_temp + ";" + ms_depth + ";" + ms_alt;
+      Serial.println("MS5837 => " + ms_pressure + " mbar, " + ms_temp + " C, " +
                  ms_depth + " m, " + ms_alt + " m above sea");
-    send_message(message);
+      send_message(message);
+    } 
   }
 
   if(mSensor == "temp"){
