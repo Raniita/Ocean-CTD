@@ -132,14 +132,15 @@ void setup(){
   delay(1500);
 
   udp.begin(local_port);
-  Serial.print("IP: ");
+  Serial.print(F("IP: "));
   Serial.println(Ethernet.localIP());
-  //Serial.println(" port: " + local_port);
-  //Serial.println("IP: " + Ethernet.localIP() + " port: " + local_port);
-  //Serial.println("IP Server: " + ip_server + " port: " + server_port);
+  Serial.println("Port: " + local_port);
 
   // Configuracion I2C sensors
   Wire.begin();
+  delay(100);
+  
+  // Go UP Sensors
   temp.init();
   while (!presion.init()){
     if(retry > 10) {
@@ -159,7 +160,7 @@ void setup(){
   }
   
   Serial.println("");
-  delay(2000);
+  delay(1000);
 }
 
 void loop(){
@@ -186,8 +187,8 @@ void read_sensor(String mSensor){
   // <type>;<measure> (i2c sensors)
   
   if(mSensor == "cdom"){
-    cdom_measure = (String) cdom.sample();
-    cdom_mv = (String) cdom.measure();
+    cdom_measure = (String) cdom.measure();
+    cdom_mv = (String) cdom.getMV();
     cdom_gain = (String) cdom.getGain();
 
     message = "cdom;" + cdom_gain + ";" + cdom_measure + ";" + cdom_mv;
@@ -196,8 +197,8 @@ void read_sensor(String mSensor){
   }
 
   if(mSensor == "phy"){
-    phy_measure = (String) phy.sample();
-    phy_mv = (String) phy.measure();
+    phy_measure = (String) phy.measure();
+    phy_mv = (String) phy.getMV();
     phy_gain = (String) phy.getGain();
 
     message = "phy;" + phy_gain + ";" + phy_measure + ";" + phy_mv;
@@ -206,8 +207,8 @@ void read_sensor(String mSensor){
   }
 
   if(mSensor == "chl"){
-    chl_measure = (String) chl.sample();
-    chl_mv = (String) chl.measure();
+    chl_measure = (String) chl.measure();
+    chl_mv = (String) chl.getMV();
     chl_gain = (String) chl.getGain();
 
     message = "chl;" + chl_gain + ";" + chl_measure + ";" + chl_mv;

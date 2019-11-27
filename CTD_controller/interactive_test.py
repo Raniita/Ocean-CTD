@@ -13,14 +13,14 @@ sock.bind(("", 45045))
 sock.settimeout(2)  # 1 sec timeout
 
 while True:
-    msg = input("Commando to send: ")
+    msg = input("Command to send: ")
     sock.sendto(msg.encode(), address)
     try:
         data, ip = sock.recvfrom(1024)
         print("{}: {}".format(ip, data.decode()))
 
     except:
-        print("No ha llegao")
+        print("No response")
         pass
 
     

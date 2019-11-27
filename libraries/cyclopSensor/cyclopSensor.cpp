@@ -23,7 +23,6 @@ cyclopSensor::cyclopSensor(byte mId, byte mPin, byte mx10, byte mx100)
 	maxMV = 5000;		// mV maximos segun las especs
 	switchDelay = 1500; // In seconds
 	gain = 1;
-	controlled = false;
 
 	// Declarations of I/O
 	pinMode(pin, INPUT);   // Pin de lectura del sensor
@@ -128,14 +127,27 @@ void cyclopSensor::adjustGain()
 double cyclopSensor::sample()
 {
 	autoGain();
-	return map(analogRead(pin), 0, 1023, 0, maxPPB / gain);
+	delay(200);
+
+	read = analogRead(pin);
+	// Guardamos mV
+	mV = map(read, 0, 1023, 0, maxMV);
+	// Devolvemos ppb
+	return map_double(read, 0, 1023, 0, maxPPB / gain);
 }
 
 // Conjunto de metodos para mi implementacion de autoganancia
+// DISCLAIMER: El metodo da mV coherentes, comprobado con DT
 double cyclopSensor::measure()
 {
 	adjustGain();
-	return map(analogRead(pin), 0, 1023, 0, maxMV);
+	delay(200);
+
+	read = analogRead(pin);
+	// Guardamos mV
+	mV = map(read, 0, 1023, 0, maxMV);
+	// Devolvemos ppb
+	return map_double(read, 0, 1023, 0, maxPPB / gain);
 }
 
 double cyclopSensor::measure(bool autogain)
@@ -143,37 +155,24 @@ double cyclopSensor::measure(bool autogain)
 	// Si autogain -> true ajustamos la ganancia y medimos
 	// Si !autogain -> medimos con la ganacia anterior
 	if (autogain)
-		adjustGain();
-	return map(analogRead(pin), 0, 1023, 0, maxMV);
-}
-
-double cyclopSensor::measure(bool autogain, bool ppb)
-{
-	// Si autogain -> true ajustamos la ganancia y medimos
-	// Si !autogain -> medimos con la ganacia anterior
-	if (autogain)
-		adjustGain();
-	value = map(analogRead(pin), 0, 1023, 0, maxMV);
-
-	if (ppb == true)
 	{
-		// Convertimos a ppb
-		value = map_double(analogRead(pin), 0, 1023, 0, maxPPB / gain);
-		return value; // Devolvemos PPB
+		adjustGain();
+		delay(200);
 	}
-	else
-	{
-		return value; // Devolvemos mV
-	}
+
+	read = analogRead(pin);
+	// Guardamos mV
+	mV = map(read, 0, 1023, 0, maxMV);
+	// Devolvemos ppb
+	return map_double(read, 0, 1023, 0, maxMV);
 }
 
 double cyclopSensor::convert2ppb(double measure)
 {
-	// Hay que preguntar
-	return measure;
+	return map_double(measure, 0, 1023, 0, maxPPB / gain);;
 }
 
-int cyclopSensor::getGain()
+uint8_t cyclopSensor::getGain()
 {
 	return gain;
 }
@@ -183,7 +182,7 @@ void cyclopSensor::setGain(uint8_t mGain)
 	switchGain(mGain);
 }
 
-int cyclopSensor::getMaxPPB()
+double cyclopSensor::getMaxPPB()
 {
 	return maxPPB;
 }
@@ -191,6 +190,11 @@ int cyclopSensor::getMaxPPB()
 void cyclopSensor::setMaxPPB(double mPPB)
 {
 	maxPPB = mPPB;
+}
+
+double cyclopSensor::getMV()
+{
+	return mV;
 }
 
 void cyclopSensor::switchGain(uint8_t mGain)

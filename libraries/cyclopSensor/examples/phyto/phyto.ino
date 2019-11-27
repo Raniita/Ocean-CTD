@@ -1,3 +1,6 @@
+/*
+	Example for phycoeritrina sensor
+*/
 #include <cyclopSensor.h>
 
 #define phy_type "phy"
@@ -21,8 +24,8 @@ void setup(){
 }
 
 void loop(){
-    phy_measure = (String) phy.sample();
-    phy_mv = (String) phy.measure();
+    phy_measure = (String) phy.measure();
+    phy_mv = (String) phy.getMV();
     phy_gain = (String) phy.getGain();
     
     Serial.println("PHY => x" + phy_gain + " value: " + phy_measure + " mV: " + phy_mv);
