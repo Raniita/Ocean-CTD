@@ -1,32 +1,60 @@
 #!/usr/bin/env python
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from multiprocessing import Process
 from datetime import datetime
 import socket, time, csv
 
 # Arduino IP + port
-arduino = ('10.0.1.10', 55055)
+arduino = ('localhost', 55055)
 buffersize = 1024
 
-#station = input("Please introduce name of current station: ")
-station = 'e1'
-date = datetime.today().strftime("%Y-%m-%d")
-start_timestamp = datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
+# CSV
+station = input("Please introduce name of current station: ")
+start_timestamp = datetime.today().strftime("%d-%m-%Y")
 
-filename = "".join((start_timestamp,station,".csv"))
-log_filename = "".join((start_timestamp,station,"_log.csv"))
+filename = "".join((station, "-", start_timestamp,".csv"))
 
-csvfile = open(filename, 'wt')
-logfile = open(log_filename, 'wt')
-
-csv_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-csv_writer.writerow(["station", "date", "depth", "var1", "var2", "var3"])
+with open(filename, 'a') as f:
+    row = ["station", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
+    writer = csv.writer(f)
+    writer.writerow(row)
 
 # UPD Socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(("", 45045))
-
-sock.settimeout(2)  # 1 sec timeout
-
+sock.settimeout(5)  
 print("Receiving data: ... \n")
+
+# Plot
+def live_plot():
+    def animate(i):
+        try:
+            data = pd.read_csv(filename)
+            x_values = data['time']
+            y1_values = data['temp1']
+            y2_values = data['temp2']
+            plt.cla()
+            plt.plot(x_values, y1_values, label="temp1")
+            plt.plot(x_values, y2_values, label="temp2")
+            plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+        except pd.io.common.EmptyDataError:
+            print (filename, " is empty")    
+        plt.xlabel('Time')
+        plt.ylabel('Temperature (Celsius)')
+        plt.title(station)
+        plt.gcf().autofmt_xdate()
+        plt.tight_layout()
+        
+    ani = FuncAnimation(plt.gcf(), animate, 100)
+
+    plt.tight_layout()
+    plt.show()
+
+# Definition plot thread
+p = Process(target=live_plot)
+p.start()
 
 while True:
     # cdom -> Respuesta: <type>;<gain>;<measure>;<mv> (cyclops)
@@ -40,24 +68,27 @@ while True:
     try:
         recv_d, addr = sock.recvfrom(buffersize)
         data = recv_d.decode().split(";")
-        pressure = data[1]
-        temp1 = data[2]
-        depth = data[3]
-        altitude = data[4]
+        if(data[1] == "error"):
+            pressure = data[1]
+            temp1 = data[1]
+            depth = data[1]
+            altitude = data[1]
+        else:
+            pressure = data[1]
+            temp1 = data[2]
+            depth = data[3]
+            altitude = data[4]
 
-        print(f"[MS5] Depth: {depth} Pressure: {pressure} Altitude: {altitude} Temp: {temp1}")
+            print(f"[MS5] Depth: {depth} Pressure: {pressure} Altitude: {altitude} Temp: {temp1}")
 
-        # Save log files
-
-        # Save OK
-        ms5_read = True
-
+            # Save OK
+            ms5_read = True
     except:
         ms5_read = False
         print("Error on ms5")
         pass
 
-    time.sleep(2)   # little delay until the next command
+    #time.sleep(1)
 
     msg2send = "cdom"
     sock.sendto(msg2send.encode(), arduino)
@@ -70,8 +101,6 @@ while True:
 
         print(f"[CDOM] Gain: {cdom_gain} PPB: {cdom_ppb} mV: {cdom_mv}")
 
-        # Save to log files
-
         # Save OK
         cdom_read = True
 
@@ -80,7 +109,7 @@ while True:
         print("Error reading cdom")
         pass
     
-    time.sleep(2)
+    #time.sleep(1)
 
     msg2send = "phy"
     sock.sendto(msg2send.encode(), arduino)
@@ -93,8 +122,6 @@ while True:
 
         print(f"[PHY] Gain: {phy_gain} PPB: {phy_ppb} mV: {phy_mv}")
 
-        # Save to log files
-
         # Save OK
         phy_read = True
 
@@ -103,7 +130,7 @@ while True:
         print("Error reading phy")
         pass
 
-    time.sleep(2)
+    #time.sleep(1)
 
     msg2send = "chl"
     sock.sendto(msg2send.encode(), arduino)
@@ -116,8 +143,6 @@ while True:
 
         print(f"[CHL] Gain: {chl_gain} PPB: {chl_ppb} mV: {chl_mv}")
 
-        # Save to log files
-
         # Save OK
         chl_read = True
 
@@ -126,7 +151,7 @@ while True:
         print("Error reading chl")
         pass
 
-    time.sleep(2)
+    #time.sleep(1)
 
     msg2send = "temp"
     sock.sendto(msg2send.encode(), arduino)
@@ -136,8 +161,6 @@ while True:
         temp2 = data[1]
 
         print(f"[Temp] temp2: {temp2}")
-
-        # Save to log files
 
         # Save OK
         temp_read = True
@@ -149,6 +172,12 @@ while True:
 
     if(ms5_read == True and cdom_read == True and phy_read == True and chl_read == True and temp_read == True):
         # Write to CSV
-        csv_writer.writerow([station, date, depth, cdom_ppb, phy_ppb, chl_ppb])
+        time = datetime.today().strftime("%H:%M:%S")
+        row = [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
+
+        with open(filename, 'a') as f:
+            writer = csv.writer(f)
+            writer.writerow(row)
     else:
         print("Unable to save on csv.")
+p.join()

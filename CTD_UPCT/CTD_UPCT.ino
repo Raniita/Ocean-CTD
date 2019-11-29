@@ -91,7 +91,7 @@ MS5837 presion;
 TSYS01 temp;
 
 bool presion_fail = false;
-int retry;
+int retry = 0;
 
 // Utilidades
 EthernetUDP udp;
@@ -154,12 +154,12 @@ void setup(){
     delay(2000);
   }
   
-  if(presion_fail = false){
+  if(presion_fail == false){
     presion.setModel(MS5837::MS5837_30BA);
     presion.setFluidDensity(1029); // kg/m^3 (1029 for seawater)
   }
-  
-  Serial.println("");
+
+  Serial.println("Ready: ");
   delay(1000);
 }
 
@@ -217,7 +217,7 @@ void read_sensor(String mSensor){
   }
 
   if(mSensor == "ms5"){
-    if(presion_fail = true){
+    if(presion_fail == true){
       // Presion sensor doesnt boot. ERROR
       message = "ms5;error";
       Serial.println("MS5837 => Error, sensor doesnt boot");

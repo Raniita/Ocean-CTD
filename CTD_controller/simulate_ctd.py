@@ -1,4 +1,5 @@
-import socket
+import socket,time
+import random as rd
 
 server_port = 55055
 
@@ -15,21 +16,27 @@ while True:
 
     if(decode_msg == "cdom"):
         message = "cdom;10;34;3000"
+        time.sleep(0.5)
         sock.sendto(message.encode(), addr)
+        
     if(decode_msg == "phy"):
         message = "phy;100;24;2400"
+        time.sleep(0.5)
         sock.sendto(message.encode(), addr)
 
     if(decode_msg == "chl"):
         message = "chl;1;10;1500"
+        time.sleep(0.5)
         sock.sendto(message.encode(), addr)
 
     if(decode_msg == "ms5"):
-        message = "ms5;1;20;2.5;100"
+        message = "ms5;1;"+ str(rd.randrange(0, 30)) +";2.5;100"
+        time.sleep(0.5)
         sock.sendto(message.encode(), addr)
 
     if(decode_msg == "temp"):
-        message = "temp;25"
+        message = "temp;" + str(rd.randrange(0,30))
+        time.sleep(0.5)
         sock.sendto(message.encode(), addr)
 
     del data
