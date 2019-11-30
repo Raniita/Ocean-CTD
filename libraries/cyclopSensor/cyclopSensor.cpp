@@ -48,6 +48,47 @@ double cyclopSensor::map_double(double x, double in_min, double in_max, double o
 	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+double cyclopSensor::calcPPB(uint8_t mGain, uint16_t mmV, double mmaxPPB)
+{
+	switch(mmaxPPB){
+		case 1500 :
+			// CDOM
+			if(mGain == 10){
+				ppb = mmV * 0.0312;
+			} else if(mGain == 100) {
+				ppb = mmV * 0.0033;
+			} else {
+				ppb = mmV * 0.3021;
+			}
+			return ppb;
+		
+		case 750 : 
+			// PHY
+			if(mGain == 10){
+				ppb = mmV * 0.0152;
+			} else if(mGain == 100) {
+				ppb = mmV * 0.0016;
+			} else {
+				ppb = mmV * 0.1510;
+			}
+			return ppb;
+
+		case 500 :
+			// CHL
+			if(mGain == 10){
+				ppb = mmV * 0,0102;
+			} else if(mGain == 100) {
+				ppb = mmV * 0,0010;
+			} else {
+				ppb = mmV * 0,1007;
+			}
+			return ppb;
+
+		default:
+			return 0;
+	}
+}
+
 // Metodo extraido de la primera version del codigo
 void cyclopSensor::autoGain()
 {
@@ -127,7 +168,7 @@ void cyclopSensor::adjustGain()
 double cyclopSensor::sample()
 {
 	autoGain();
-	delay(200);
+	delay(50);
 
 	read = analogRead(pin);
 	// Guardamos mV
@@ -141,13 +182,14 @@ double cyclopSensor::sample()
 double cyclopSensor::measure()
 {
 	adjustGain();
-	delay(200);
+	delay(50);
 
 	read = analogRead(pin);
 	// Guardamos mV
 	mV = map(read, 0, 1023, 0, maxMV);
 	// Devolvemos ppb
-	return map_double(read, 0, 1023, 0, maxPPB / gain);
+	//return map_double(read, 0, 1023, 0, maxPPB / gain);
+	return calcPPB(gain, mV, maxPPB);
 }
 
 double cyclopSensor::measure(bool autogain)
@@ -164,7 +206,8 @@ double cyclopSensor::measure(bool autogain)
 	// Guardamos mV
 	mV = map(read, 0, 1023, 0, maxMV);
 	// Devolvemos ppb
-	return map_double(read, 0, 1023, 0, maxMV);
+	//return map_double(read, 0, 1023, 0, maxMV);
+	return calcPPB(gain, mV, maxPPB);
 }
 
 double cyclopSensor::convert2ppb(double measure)
