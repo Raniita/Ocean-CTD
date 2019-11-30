@@ -15,6 +15,7 @@ station = input("Please introduce name of current station: ")
 start_timestamp = datetime.today().strftime("%d-%m-%Y")
 
 filename = "".join((station, "-", start_timestamp,".csv"))
+videofilename = "".join((station, "-", start_timestamp,".mp4"))
 
 with open(filename, 'a') as f:
     row = ["station", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
@@ -29,29 +30,38 @@ print("Receiving data: ... \n")
 
 # Plot
 def live_plot():
+    """ Threaded func to get the CSV data and plotting it """
+    
+    # Ventana de datos
+    win = 100     
+
     def animate(i):
+        """ Animate Function """
         try:
             data = pd.read_csv(filename)
             x_values = data['time']
             y1_values = data['temp1']
             y2_values = data['temp2']
+            imin = min(max(0, i - win), x_values.size - win)    # Ajustes de la ventana
             plt.cla()
-            plt.plot(x_values, y1_values, label="temp1")
-            plt.plot(x_values, y2_values, label="temp2")
+            plt.plot(x_values[imin:i], y1_values[imin:i], label="temp1")
+            plt.plot(x_values[imin:i], y2_values[imin:i], label="temp2")
             plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
         except pd.io.common.EmptyDataError:
             print (filename, " is empty")    
+        
         plt.xlabel('Time')
         plt.ylabel('Temperature (Celsius)')
-        plt.title(station)
+        plt.title('CDOM-PE-CHL')
         plt.gcf().autofmt_xdate()
         plt.tight_layout()
         
-    ani = FuncAnimation(plt.gcf(), animate, 100)
+    ani = FuncAnimation(plt.gcf(), animate, 1000)
+    ani.save(videofilename, writer='ffmpeg')
 
     plt.tight_layout()
     plt.show()
-
+    
 # Definition plot thread
 p = Process(target=live_plot)
 p.start()
@@ -180,4 +190,5 @@ while True:
             writer.writerow(row)
     else:
         print("Unable to save on csv.")
+        
 p.join()

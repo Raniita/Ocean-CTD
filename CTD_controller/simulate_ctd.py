@@ -30,7 +30,7 @@ while True:
         sock.sendto(message.encode(), addr)
 
     if(decode_msg == "ms5"):
-        message = "ms5;1;"+ str(rd.randrange(0, 30)) +";2.5;100"
+        message = "ms5;1;"+ str(rd.randrange(0, 30)) +";"+ str(rd.randrange(0,10))+";100"
         time.sleep(0.5)
         sock.sendto(message.encode(), addr)
 
