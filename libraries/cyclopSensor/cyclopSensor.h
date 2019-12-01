@@ -22,7 +22,7 @@ class cyclopSensor {
 		uint16_t switchDelay, lastValue, value, mV;
 
 		//func
-		double calcPPB(uint8_t mGain, uint16_t mmV, double mmaxPPB), map_double(double x, double in_min, double in_max, double out_min, double out_max);
+		double calcPPB(uint8_t mGain, uint16_t mmV, int mmaxPPB), map_double(double x, double in_min, double in_max, double out_min, double out_max);
 		void autoGain(), adjustGain(), switchGain(uint8_t mGain);
 };
 

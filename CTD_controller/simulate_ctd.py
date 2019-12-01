@@ -15,17 +15,17 @@ while True:
     decode_msg = data.decode()
 
     if(decode_msg == "cdom"):
-        message = "cdom;10;34;3000"
+        message = "cdom;10;"+ str(rd.randrange(10, 25)) +";3000"
         time.sleep(0.5)
         sock.sendto(message.encode(), addr)
         
     if(decode_msg == "phy"):
-        message = "phy;100;24;2400"
+        message = "phy;100;"+ str(rd.randrange(5, 10)) +";2400"
         time.sleep(0.5)
         sock.sendto(message.encode(), addr)
 
     if(decode_msg == "chl"):
-        message = "chl;1;10;1500"
+        message = "chl;1;"+ str(rd.randrange(2, 8)) +";1500"
         time.sleep(0.5)
         sock.sendto(message.encode(), addr)
 

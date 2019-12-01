@@ -39,7 +39,7 @@ def live_plot():
         """ Animate Function """
         try:
             data = pd.read_csv(filename)
-            x_values = data['depth']
+            x_values = data['time']
             y1_values = data['cdom_ppb']
             y2_values = data['pe_ppb']
             y3_values = data['chl_ppb']
@@ -52,7 +52,7 @@ def live_plot():
         except pd.io.common.EmptyDataError:
             print (filename, " is empty")    
         
-        plt.xlabel('Depth (m)')
+        plt.xlabel('Time')
         plt.ylabel('PPB')
         plt.title("".join(("CDOM-PE-CHL on ", station)))
         plt.gcf().autofmt_xdate()

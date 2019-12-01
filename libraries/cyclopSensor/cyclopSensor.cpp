@@ -48,7 +48,7 @@ double cyclopSensor::map_double(double x, double in_min, double in_max, double o
 	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-double cyclopSensor::calcPPB(uint8_t mGain, uint16_t mmV, double mmaxPPB)
+double cyclopSensor::calcPPB(uint8_t mGain, uint16_t mmV, int mmaxPPB)
 {
 	switch(mmaxPPB){
 		case 1500 :
