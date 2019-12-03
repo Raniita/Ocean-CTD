@@ -7,7 +7,7 @@ from datetime import datetime
 import socket, time, csv
 
 # Arduino IP + port
-arduino = ('localhost', 55055)
+arduino = ('10.0.1.10', 55055)
 buffersize = 1024
 
 # CSV

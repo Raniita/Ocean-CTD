@@ -76,11 +76,11 @@ double cyclopSensor::calcPPB(uint8_t mGain, uint16_t mmV, int mmaxPPB)
 		case 500 :
 			// CHL
 			if(mGain == 10){
-				ppb = mmV * 0,0102;
+				ppb = mmV * 0.0102;
 			} else if(mGain == 100) {
-				ppb = mmV * 0,0010;
+				ppb = mmV * 0.0010;
 			} else {
-				ppb = mmV * 0,1007;
+				ppb = mmV * 0.1007;
 			}
 			return ppb;
 
