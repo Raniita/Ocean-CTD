@@ -5,8 +5,6 @@
 #include <TSYS01.h>
 #include <MS5837.h>
 #include <cyclopSensor.h>
-//#include <LowPower.h>
-
 #include <Wire.h>
 #include <SPI.h>
 
@@ -52,18 +50,15 @@
 #define sd_pin 4
 
 // Local configs
-#define hostname "upct_ctd"
 byte mac[6] = { 0x90, 0xA2, 0xDA, 0x2A, 0xB8, 0xCE };
 unsigned int local_port = 55055;
 
-// IP Static config
-IPAddress ip(10, 0, 1, 10);
-IPAddress gw(10, 0, 1, 1);
-IPAddress my_dns(1, 1, 1, 1);
-IPAddress subnet(255, 255, 255, 0);
+// IP Static config (Router Amarillo == DHCP)
+//IPAddress ip(10, 0, 1, 10);
+//IPAddress gw(10, 0, 1, 1);
+//IPAddress my_dns(1, 1, 1, 1);
+//IPAddress subnet(255, 255, 255, 0);
 
-// IP + Port Server
-IPAddress ip_server(192, 168, 1, 5);
 unsigned int server_port = 45045;
 
 // UDP configs
@@ -116,12 +111,13 @@ void setup(){
 
   // Configuracion Ethernet
   Serial.println(F("Initialize Ethernet with DHCP:")); 
+  
   // Static w5100
   //Ethernet.begin(mac, ip, my_dns, gw, subnet); 
-  
   // Static w5500 (Ethernet3)
   //Ethernet.begin(mac, ip, subnet, gw);
   
+  // DHCP
   if(Ethernet.begin(mac) == 0){
     Serial.println(F("Error on Ethernet. Not booting."));
     while(true){
@@ -129,7 +125,7 @@ void setup(){
     }
   }
   
-  delay(1500);
+  delay(1000);
 
   udp.begin(local_port);
   Serial.print(F("IP: "));
@@ -251,8 +247,5 @@ void send_message(String msg){
   udp.beginPacket(udp.remoteIP(), udp.remotePort());
   udp.print(msg);
   udp.endPacket();
-
-  delay(200);
   memset(packetBuffer, 0, UDP_TX_PACKET_MAX_SIZE);
-  delay(200);
 }

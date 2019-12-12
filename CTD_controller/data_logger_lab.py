@@ -55,7 +55,7 @@ def live_plot(filename, station):
         plt.gcf().autofmt_xdate()
         plt.tight_layout()
         
-    ani = FuncAnimation(plt.gcf(), animate, 1000)
+    ani = FuncAnimation(plt.gcf(), animate, 3000)
     #ani.save(videofilename, writer='ffmpeg')
 
     plt.tight_layout()
