@@ -7,7 +7,7 @@ from datetime import datetime
 import socket, time, csv
 
 # Plot
-def live_plot():
+def live_plot(filename, station):
     """ Threaded func to get the CSV data and plotting it """
     
     # Ventana de datos
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     print("Receiving data: ... \n")
 
     # Definition plot thread
-    p = Process(target=live_plot)
+    p = Process(target=live_plot, args=(filename, station,))
     p.start()
 
     while True:
