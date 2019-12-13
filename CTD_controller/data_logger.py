@@ -17,6 +17,7 @@ def live_plot(filename, station):
         """ Animate Function """
         try:
             ## Read the csv
+            data = pd.read_csv(filename)
             y_values = data['depth']
             x1_values = data['cdom_ppb']
             last_cdom = str(x1_values.iloc[-1])
@@ -32,7 +33,7 @@ def live_plot(filename, station):
                 last_chl = "none"
 
             # Limit the data
-            imin = min(max(0, i - win), x_values.size - win)
+            imin = min(max(0, i - win), y_values.size - win)
             
             ## Plotting all the data of the csv, show the last on legend
             plt.cla()
