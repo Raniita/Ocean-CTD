@@ -5,6 +5,7 @@ from matplotlib.animation import FuncAnimation
 from multiprocessing import Process
 from datetime import datetime
 import socket, time, csv
+import gpsd
 
 # Plot
 def live_plot(filename, station):
@@ -16,7 +17,7 @@ def live_plot(filename, station):
     def animate(i):
         """ Animate Function """
         try:
-            ## Read the csv
+            # Read the csv
             data = pd.read_csv(filename)
             x_values = data['time']
             y1_values = data['cdom_ppb']
@@ -26,7 +27,7 @@ def live_plot(filename, station):
             y3_values = data['chl_ppb']
             last_chl = str(y3_values.iloc[-1])
 
-            ## Fix first row csv, empty values
+            # Fix first row csv, empty values
             if(last_cdom == "cdom_ppb"):
                 last_cdom = "none"
                 last_phy = "none"
@@ -35,7 +36,7 @@ def live_plot(filename, station):
             # Limit the data
             imin = min(max(0, i - win), x_values.size - win)
             
-            ## Plotting all the data of the csv, show the last on legend
+            # Plotting all the data of the csv, show the last on legend
             plt.cla()
             plt.plot(x_values[imin:i], y1_values[imin:i], label="cdom_ppb")
             plt.plot([],[], ' ', label="CDOM: "+last_cdom)
@@ -66,17 +67,28 @@ if __name__ == '__main__':
     arduino = ('localhost', 55055)
     buffersize = 1024
 
-    # CSV
     station = input("Please introduce name of current station: ")
     start_timestamp = datetime.today().strftime("%d-%m-%Y")
 
     filename = "".join((station, "-", start_timestamp,".csv"))
     #videofilename = "".join((station, "-", start_timestamp,".mp4"))
 
-    with open(filename, 'a') as f:
-        row = ["station", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
-        writer = csv.writer(f)
-        writer.writerow(row)
+    # Ask to use GPSd info?
+    use_gpsd = input("Use GPS? [y/N]: ")
+    if use_gpsd == "y":
+        # GPSd en el router amarillo
+        print("Using GPS on 10.0.1.1")
+        gpsd.connect(host="10.0.1.1", port=2947)
+
+        with open(filename, 'a') as f:
+            row = ["station", "time", "lat", "long", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
+            writer = csv.writer(f)
+            writer.writerow(row)
+    else:
+        with open(filename, 'a') as f:
+            row = ["station", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
+            writer = csv.writer(f)
+            writer.writerow(row)
 
     # UPD Socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -111,16 +123,14 @@ if __name__ == '__main__':
                 depth = data[3]
                 altitude = data[4]
 
-                print(f"[MS5] Depth: {depth} Pressure: {pressure} Altitude: {altitude} Temp: {temp1}")
+                print(f"[MS5] Depth:{depth} Pressure:{pressure} Altitude:{altitude} Temp:{temp1}")
 
                 # Save OK
                 ms5_read = True
         except:
             ms5_read = False
-            print("Error on ms5")
+            print("Error. No response for depth.")
             pass
-
-        #time.sleep(1)
 
         msg2send = "cdom"
         sock.sendto(msg2send.encode(), arduino)
@@ -131,16 +141,14 @@ if __name__ == '__main__':
             cdom_ppb = data[2]
             cdom_mv = data[3]
 
-            print(f"[CDOM] Gain: {cdom_gain} PPB: {cdom_ppb} mV: {cdom_mv}")
+            print(f"[CDOM] Gain:{cdom_gain} PPB:{cdom_ppb} mV:{cdom_mv}")
 
             # Save OK
             cdom_read = True
         except:
             cdom_read = False
-            print("Error reading cdom")
+            print("Error. No response for cdom.")
             pass
-    
-        #time.sleep(1)
 
         msg2send = "phy"
         sock.sendto(msg2send.encode(), arduino)
@@ -151,16 +159,14 @@ if __name__ == '__main__':
             phy_ppb = data[2]
             phy_mv = data[3]
 
-            print(f"[PHY] Gain: {phy_gain} PPB: {phy_ppb} mV: {phy_mv}")
+            print(f"[PE] Gain:{phy_gain} PPB:{phy_ppb} mV:{phy_mv}")
 
             # Save OK
             phy_read = True
         except:
             phy_read = False
-            print("Error reading phy")
+            print("Error. No response for pe.")
             pass
-
-        #time.sleep(1)
 
         msg2send = "chl"
         sock.sendto(msg2send.encode(), arduino)
@@ -171,16 +177,14 @@ if __name__ == '__main__':
             chl_ppb = data[2]
             chl_mv = data[3]
 
-            print(f"[CHL] Gain: {chl_gain} PPB: {chl_ppb} mV: {chl_mv}")
+            print(f"[CHL] Gain:{chl_gain} PPB:{chl_ppb} mV:{chl_mv}")
 
             # Save OK
             chl_read = True
         except:
             chl_read = False
-            print("Error reading chl")
+            print("Error. No response for chl.")
             pass
-
-        #time.sleep(1)
 
         msg2send = "temp"
         sock.sendto(msg2send.encode(), arduino)
@@ -189,24 +193,30 @@ if __name__ == '__main__':
             data = recv_d.decode().split(";")
             temp2 = data[1]
 
-            print(f"[Temp] temp2: {temp2}")
+            print(f"[Temp] temp2:{temp2}")
 
             # Save OK
             temp_read = True
         except:
             temp_read = False
-            print("Error reading temp")
+            print("Error. No response for temp2.")
             pass
 
         if(ms5_read == True and cdom_read == True and phy_read == True and chl_read == True and temp_read == True):
             # Write to CSV
             time = datetime.today().strftime("%H:%M:%S")
-            row = [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
+            # GPSd info?
+            if use_gpsd == "y":
+                position = gpsd.get_current().position()
+                print(f"[GPS] Lat:{position[0]} Long:{position[1]}")
+                row =  [station, time, position[0], position[1], depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
+            else:
+                row = [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
 
             with open(filename, 'a') as f:
                 writer = csv.writer(f)
                 writer.writerow(row)
         else:
-            print("Unable to save on csv.")
+            print("Error. Unable to save CSV.\nSome sensors have not been read.")
 
     p.join()
