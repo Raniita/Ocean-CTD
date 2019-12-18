@@ -80,12 +80,12 @@ if __name__ == '__main__':
         print("Using GPS on 10.0.1.1")
         gpsd.connect(host="10.0.1.1", port=2947)
 
-        with open(filename, 'a') as f:
+        with open(filename, 'a', newline='') as f:
             row = ["station", "time", "lat", "long", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
             writer = csv.writer(f)
             writer.writerow(row)
     else:
-        with open(filename, 'a') as f:
+        with open(filename, 'a', newline='') as f:
             row = ["station", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
             writer = csv.writer(f)
             writer.writerow(row)
@@ -213,7 +213,7 @@ if __name__ == '__main__':
             else:
                 row = [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
 
-            with open(filename, 'a') as f:
+            with open(filename, 'a', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(row)
         else:
