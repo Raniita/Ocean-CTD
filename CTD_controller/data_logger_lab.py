@@ -141,7 +141,7 @@ if __name__ == '__main__':
             cdom_ppb = data[2]
             cdom_mv = data[3]
 
-            print(f"[CDOM] Gain:{cdom_gain} PPB:{cdom_ppb} mV:{cdom_mv}")
+            print(f"[CDOM] Gain:x{cdom_gain} PPB:{cdom_ppb} mV:{cdom_mv}")
 
             # Save OK
             cdom_read = True
@@ -159,7 +159,7 @@ if __name__ == '__main__':
             phy_ppb = data[2]
             phy_mv = data[3]
 
-            print(f"[PE] Gain:{phy_gain} PPB:{phy_ppb} mV:{phy_mv}")
+            print(f"[PE] Gain:x{phy_gain} PPB:{phy_ppb} mV:{phy_mv}")
 
             # Save OK
             phy_read = True
@@ -177,7 +177,7 @@ if __name__ == '__main__':
             chl_ppb = data[2]
             chl_mv = data[3]
 
-            print(f"[CHL] Gain:{chl_gain} PPB:{chl_ppb} mV:{chl_mv}")
+            print(f"[CHL] Gain:x{chl_gain} PPB:{chl_ppb} mV:{chl_mv}")
 
             # Save OK
             chl_read = True
@@ -202,7 +202,7 @@ if __name__ == '__main__':
             print("Error. No response for temp2.")
             pass
 
-        if(ms5_read == True and cdom_read == True and phy_read == True and chl_read == True and temp_read == True):
+        if(ms5_read and cdom_read and phy_read and chl_read and temp_read):
             # Write to CSV
             time = datetime.today().strftime("%H:%M:%S")
             # GPSd info?
