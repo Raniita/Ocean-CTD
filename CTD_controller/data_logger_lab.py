@@ -81,7 +81,7 @@ if __name__ == '__main__':
         gpsd.connect(host="10.0.1.1", port=2947)
 
         with open(filename, 'a', newline='') as f:
-            row = ["station", "time", "lat", "long", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
+            row = ["station","lattitude", "longitude", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
             writer = csv.writer(f)
             writer.writerow(row)
     else:
@@ -208,8 +208,8 @@ if __name__ == '__main__':
             # GPSd info?
             if use_gpsd == "y":
                 position = gpsd.get_current().position()
-                print(f"[GPS] Lat:{position[0]} Long:{position[1]}")
-                row =  [station, time, position[0], position[1], depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
+                print(f"[GPS] Lattitude:{position[0]} Longitude:{position[1]}")
+                row =  [station, position[0], position[1], time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
             else:
                 row = [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
 
