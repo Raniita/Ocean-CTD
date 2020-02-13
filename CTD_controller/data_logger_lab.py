@@ -20,11 +20,11 @@ def live_plot(filename, station):
             # Read the csv
             data = pd.read_csv(filename, delimiter=';')
             x_values = data['time']
-            y1_values = data['cdom_ppb']
+            y1_values = data['cdom [ppb]']
             last_cdom = str(y1_values.iloc[-1])
-            y2_values = data['pe_ppb']
+            y2_values = data['pe [ppb]']
             last_phy = str(y2_values.iloc[-1])
-            y3_values = data['chl_ppb']
+            y3_values = data['chl [ppb]']
             last_chl = str(y3_values.iloc[-1])
 
             # Fix first row csv, empty values
@@ -63,8 +63,8 @@ def live_plot(filename, station):
     plt.show()
     
 if __name__ == '__main__':
-    # Arduino IP + port
-    arduino = ('localhost', 55055)
+    # Arduino IP + port [10.0.1.10 DHCP del barco]
+    arduino = ('10.0.1.10', 55055)
     buffersize = 1024
 
     station = input("Please introduce name of current station: ")
