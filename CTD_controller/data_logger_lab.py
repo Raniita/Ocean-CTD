@@ -18,7 +18,7 @@ def live_plot(filename, station):
         """ Animate Function """
         try:
             # Read the csv
-            data = pd.read_csv(filename)
+            data = pd.read_csv(filename, delimiter=';')
             x_values = data['time']
             y1_values = data['cdom_ppb']
             last_cdom = str(y1_values.iloc[-1])
@@ -38,11 +38,11 @@ def live_plot(filename, station):
             
             # Plotting all the data of the csv, show the last on legend
             plt.cla()
-            plt.plot(x_values[imin:i], y1_values[imin:i], label="cdom_ppb")
+            plt.plot(x_values[imin:i], y1_values[imin:i], color="orange", label="cdom_ppb")
             plt.plot([],[], ' ', label="CDOM: "+last_cdom)
-            plt.plot(x_values[imin:i], y2_values[imin:i], label="pe_ppb")
+            plt.plot(x_values[imin:i], y2_values[imin:i], color="blue", label="pe_ppb")
             plt.plot([],[], ' ', label="PE: "+last_phy)
-            plt.plot(x_values[imin:i], y3_values[imin:i], label="chl_ppb")
+            plt.plot(x_values[imin:i], y3_values[imin:i], color="green", label="chl_ppb")
             plt.plot([],[], ' ', label="CHL: "+last_chl)
             plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
         except pd.io.common.EmptyDataError:
@@ -81,13 +81,16 @@ if __name__ == '__main__':
         gpsd.connect(host="10.0.1.1", port=2947)
 
         with open(filename, 'a', newline='') as f:
-            row = ["station","lattitude", "longitude", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
-            writer = csv.writer(f)
+            row = ["station","latitude", "longitude", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
+            writer = csv.writer(f, delimiter=';')
             writer.writerow(row)
+        
+        # Save position
+        position = gpsd.get_current().position()
     else:
         with open(filename, 'a', newline='') as f:
-            row = ["station", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
-            writer = csv.writer(f)
+            row = ["station", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
+            writer = csv.writer(f, delimiter=';')
             writer.writerow(row)
 
     # UPD Socket
@@ -207,14 +210,14 @@ if __name__ == '__main__':
             time = datetime.today().strftime("%H:%M:%S")
             # GPSd info?
             if use_gpsd == "y":
-                position = gpsd.get_current().position()
+                #position = gpsd.get_current().position()
                 print(f"[GPS] Lattitude:{position[0]} Longitude:{position[1]}")
                 row =  [station, position[0], position[1], time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
             else:
                 row = [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
 
             with open(filename, 'a', newline='') as f:
-                writer = csv.writer(f)
+                writer = csv.writer(f, delimiter=';')
                 writer.writerow(row)
         else:
             print("Error. Unable to save CSV.\nSome sensors have not been read.")
