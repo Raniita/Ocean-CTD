@@ -82,14 +82,14 @@ if __name__ == '__main__':
         gpsd.connect(host="10.0.1.1", port=2947)
 
         with open(filename, 'a', newline='') as f:
-            row = ["station","latitude", "longitude", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
+            row = ["station","latitude", "longitude", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
             writer = csv.writer(f, delimiter=';')
             writer.writerow(row)
 
         position = gpsd.get_current().position()
     else:
         with open(filename, 'a', newline='') as f:
-            row = ["station", "time", "depth", "temp1", "temp2", "cdom_gain", "cdom_ppb", "cdom_mv", "pe_gain", "pe_ppb", "pe_mv", "chl_gain", "chl_ppb", "chl_mv"]
+            row = ["station", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
             writer = csv.writer(f, delimiter=';')
             writer.writerow(row)
 
