@@ -28,7 +28,7 @@ def live_plot(filename, station):
             last_chl = str(y3_values.iloc[-1])
 
             # Fix first row csv, empty values
-            if(last_cdom == "cdom_ppb"):
+            if(last_cdom == "cdom [ppb]"):
                 last_cdom = "none"
                 last_phy = "none"
                 last_chl = "none"
@@ -38,11 +38,11 @@ def live_plot(filename, station):
             
             # Plotting all the data of the csv, show the last on legend
             plt.cla()
-            plt.plot(x_values[imin:i], y1_values[imin:i], color="orange", label="cdom_ppb")
+            plt.plot(x_values[imin:i], y1_values[imin:i], color="orange", label="cdom [ppb]")
             plt.plot([],[], ' ', label="CDOM: "+last_cdom)
-            plt.plot(x_values[imin:i], y2_values[imin:i], color="blue", label="pe_ppb")
+            plt.plot(x_values[imin:i], y2_values[imin:i], color="blue", label="pe [ppb]")
             plt.plot([],[], ' ', label="PE: "+last_phy)
-            plt.plot(x_values[imin:i], y3_values[imin:i], color="green", label="chl_ppb")
+            plt.plot(x_values[imin:i], y3_values[imin:i], color="green", label="chl [ppb]")
             plt.plot([],[], ' ', label="CHL: "+last_chl)
             plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
         except pd.io.common.EmptyDataError:
