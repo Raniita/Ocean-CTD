@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from multiprocessing import Process
 from datetime import datetime
-import socket, time, csv
+import os, socket, time, csv
 import gpsd
 
 # Plot
@@ -70,6 +70,11 @@ if __name__ == '__main__':
 
     station = input("Please introduce name of current station: ")
     start_timestamp = datetime.today().strftime("%d-%m-%Y")
+
+    ## TODO:
+    # Create day folder 
+    #if not os.path.exists(start_timestamp):
+    #    os.makedirs(start_timestamp)
 
     filename = "".join((station, "-", start_timestamp,".csv"))
     #videofilename = "".join((station, "-", start_timestamp,".mp4"))
