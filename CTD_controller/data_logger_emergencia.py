@@ -21,7 +21,7 @@ if __name__ == "__main__":
     with open(filename, 'a', newline='') as f:
         row = ["station", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]",
                "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
-        writer = csv.writer(f, delimiter=';')
+        writer = csv.writer(f, delimiter=',')
         writer.writerow(row)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -149,7 +149,7 @@ if __name__ == "__main__":
             
             # Write to CSV
             with open(filename, 'a', newline='') as f:
-                writer = csv.writer(f, delimiter=';')
+                writer = csv.writer(f, delimiter=',')
                 writer.writerow(row)
 
         else:

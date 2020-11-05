@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import socket, time
 
 # IP del arduino + puerto arduinos
@@ -22,5 +23,4 @@ while True:
     except:
         print("No response")
         pass
-
     

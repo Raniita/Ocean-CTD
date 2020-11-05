@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import socket,time
 import random as rd
 

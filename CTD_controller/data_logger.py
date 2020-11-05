@@ -18,7 +18,7 @@ def live_plot(filename, station):
         """ Animate Function """
         try:
             # Read the csv
-            data = pd.read_csv(filename, delimiter=';')
+            data = pd.read_csv(filename, delimiter=',')
             y_values = data['depth']
             x1_values = data['cdom [ppb]']
             last_cdom = str(x1_values.iloc[-1])
@@ -88,14 +88,14 @@ if __name__ == '__main__':
 
         with open(filename, 'a', newline='') as f:
             row = ["station","latitude", "longitude", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
-            writer = csv.writer(f, delimiter=';')
+            writer = csv.writer(f, delimiter=',')
             writer.writerow(row)
 
         position = gpsd.get_current().position()
     else:
         with open(filename, 'a', newline='') as f:
             row = ["station", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
-            writer = csv.writer(f, delimiter=';')
+            writer = csv.writer(f, delimiter=',')
             writer.writerow(row)
 
     # UPD Socket
@@ -222,7 +222,7 @@ if __name__ == '__main__':
                 row = [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
 
             with open(filename, 'a', newline='') as f:
-                writer = csv.writer(f, delimiter=';')
+                writer = csv.writer(f, delimiter=',')
                 writer.writerow(row)
         else:
             print("Error. Unable to save CSV.\nSome sensors have not been read.")
