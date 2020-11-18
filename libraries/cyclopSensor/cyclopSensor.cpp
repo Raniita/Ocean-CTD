@@ -19,7 +19,7 @@ cyclopSensor::cyclopSensor(byte mId, byte mPin, byte mx10, byte mx100)
 	x100 = mx100;
 
 	maxMV = 5000;		// mV maximos segun las especs
-	switchDelay = 750; 	// In seconds
+	switchDelay = 450;  // In seconds
 	gain = 1;
 
 	// Declarations of I/O
@@ -133,7 +133,7 @@ void cyclopSensor::adjustGain()
 		// Gain at x1
 		switchGain(1);
 
-		if (lastValue < 300)
+		if (lastValue < 290)
 		{
 			// Switch to x10
 			switchGain(10);
@@ -145,7 +145,7 @@ void cyclopSensor::adjustGain()
 	{
 		// Gain at x10
 		switchGain(10);
-		if (lastValue < 300)
+		if (lastValue < 290)
 		{
 			// Switch to x100
 			switchGain(100);

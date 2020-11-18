@@ -11,7 +11,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # Dejamos a la escucha el puerto 45045
 sock.bind(("", 45045))
 
-sock.settimeout(2)  # 1 sec timeout
+sock.settimeout(2)  # 2 sec timeout
 
 while True:
     msg = input("Command to send: ")
