@@ -5,7 +5,7 @@ A CTD device’s primary function is to detect how the conductivity and temperat
 This CTD obtain the values of colored dissolved organic matter (CDOM), Phycoerythrin (PE) and Chlorophyll (CHL).
 
 ### Based on:
-Actually using a master-slave communication. An Arduino is doing the slave, and the mastering task its doing for other devices, like phone or laptop.
+Currently using a master-slave communication. An Arduino is doing the slave, and the mastering task its doing for other devices, like phone or laptop.
 
 #### Arduino (v2)
 <img src="https://user-images.githubusercontent.com/30501761/107502491-02701400-6b99-11eb-85ca-b9cfb308657b.jpg" width="800" height="600">
@@ -31,7 +31,7 @@ Using a python based program to ask the CTD all values sensors, saving to a CSV 
 * [Temperature TSYS01](https://bluerobotics.com/store/sensors-sonars-cameras/sensors/celsius-sensor-r1/)
 
 ### Disclaimer
-This is a research version of CTD. Actually is on development.
+This is a research version of CTD. Currently is on development.
 
 This CTD is used by the research group [Mar Menor UPCT](https://ocean.upct.es/). 
 
