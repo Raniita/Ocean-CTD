@@ -5,7 +5,7 @@
 class cyclopSensor {
 	public:
 		// Constructor
-		cyclopSensor(byte mId, byte mPin, byte mx10, byte x100);
+		cyclopSensor(char mId, byte mPin, byte mx10, byte x100);
 		//vars
 		
 		//func
@@ -16,7 +16,8 @@ class cyclopSensor {
 
 	private:
 		//vars
-		uint8_t id, pin, x10, x100, gain;
+		char id;
+		uint8_t pin, x10, x100, gain;
 		double maxPPB, maxMV, ppb, read;
 		//char sn[];
 		uint16_t switchDelay, lastValue, value, mV;

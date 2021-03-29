@@ -25,7 +25,7 @@
 // Cyclops Sensors
 // Plateado
 #define cdom_type "cdom"
-#define cdom_id "1"
+#define cdom_id '1'
 #define cdom_read A1
 #define cdom_x10 5
 #define cdom_x100 6
@@ -33,7 +33,7 @@
 
 // Negro
 #define phy_type "phy"
-#define phy_id "2"
+#define phy_id '2'
 #define phy_read A0
 #define phy_x10 7
 #define phy_x100 8
@@ -41,7 +41,7 @@
 
 // Amarillo
 #define chl_type "chl"
-#define chl_id "3"
+#define chl_id '3'
 #define chl_read A2
 #define chl_x10 2
 #define chl_x100 3

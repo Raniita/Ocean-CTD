@@ -9,7 +9,7 @@
 * Constructor
 * 
 */
-cyclopSensor::cyclopSensor(byte mId, byte mPin, byte mx10, byte mx100)
+cyclopSensor::cyclopSensor(char mId, byte mPin, byte mx10, byte mx100)
 {
 	// Saving the parameters
 	// Sensor declarations
@@ -50,36 +50,37 @@ double cyclopSensor::map_double(double x, double in_min, double in_max, double o
 double cyclopSensor::calcPPB(uint8_t mGain, uint16_t mmV, int mmaxPPB)
 {
 	switch(mmaxPPB){
+	// Equation of the line extracted of the manual of each sensor.
 		case 1500 :
 			// CDOM
 			if(mGain == 10){
-				ppb = mmV * 0.0312;
+				ppb = mmV * 0.0312 - 6.1458;
 			} else if(mGain == 100) {
-				ppb = mmV * 0.0033;
+				ppb = mmV * 0.0033 - 1.5556;
 			} else {
-				ppb = mmV * 0.3021;
+				ppb = mmV * 0.3021 - 10.4733;
 			}
 			return ppb;
 		
 		case 750 : 
 			// PHY
 			if(mGain == 10){
-				ppb = mmV * 0.0152;
+				ppb = mmV * 0.0152 - 1.04061;
 			} else if(mGain == 100) {
-				ppb = mmV * 0.0016;
+				ppb = mmV * 0.0016 - 0.72222;
 			} else {
-				ppb = mmV * 0.1510;
+				ppb = mmV * 0.1510 - 5.18630;
 			}
 			return ppb;
 
 		case 500 :
 			// CHL
 			if(mGain == 10){
-				ppb = mmV * 0.0102;
+				ppb = mmV * 0.0102 - 0.7614;
 			} else if(mGain == 100) {
-				ppb = mmV * 0.0010;
+				ppb = mmV * 0.0010 - 0.2083;
 			} else {
-				ppb = mmV * 0.1007;
+				ppb = mmV * 0.1007 - 3.5247;
 			}
 			return ppb;
 
