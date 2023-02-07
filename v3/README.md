@@ -27,3 +27,7 @@
 ## Physical connections
 
 ![Schema V3](docs/schema_hardware_v3.png)
+
+## Connector for ES-2 Sensor
+
+![Pinout ES-2 Connector](docs/pinout_connector_es2.png)
