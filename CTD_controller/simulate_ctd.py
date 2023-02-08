@@ -40,6 +40,16 @@ while True:
         time.sleep(0.5)
         sock.sendto(message.encode(), addr)
 
+    if(decode_msg == "ce"):
+        message = "ce;0;" + str(rd.randrange(0,800))
+        time.sleep(0.5)
+        sock.sendto(message.encode(), addr)
+
+    if(decode_msg == "ping"):
+        message = "pong;v3"
+        time.sleep(0.5)
+        sock.sendto(message.encode(), addr)
+
     del data
     del decode_msg
     del addr

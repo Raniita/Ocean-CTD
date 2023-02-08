@@ -12,6 +12,23 @@ if __name__ == "__main__":
     arduino = ('10.0.1.10', 55055)
     buffersize = 1024
 
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(("", 45045))
+    sock.settimeout(5)
+
+    # Verify hardware version
+    msg2send = "ping"
+    sock.sendto(msg2send.encode(), arduino)
+    try:
+        recv_d, addr = sock.recvfrom(buffersize)
+        data = recv_d.decode().split(";")
+        pong = data[0]
+        version = data[1]
+        print(f"Hardware version: {version}")
+    except:
+        print("Unable to connect with probe")
+        raise Exception
+
     station = input("Introduce la estacion actual: ")
     start_timestamp = datetime.today().strftime("%d-%m-%Y")
 
@@ -19,14 +36,14 @@ if __name__ == "__main__":
 
     # Creating the csv
     with open(filename, 'a', newline='') as f:
-        row = ["station", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]",
-               "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
+        if version == "v3":
+            row = ["station","latitude", "longitude", "time", "depth", "temp1", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]", "ce [uS/cm]"]
+        else:
+            row = ["station","latitude", "longitude", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
         writer = csv.writer(f, delimiter=',')
         writer.writerow(row)
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(("", 45045))
-    sock.settimeout(5)
+    
     print("Listo para recibir datos: ... \n")
 
     while True:
@@ -42,6 +59,7 @@ if __name__ == "__main__":
         # chl -> Respuesta: <type>;<gain>;<measure>;<mv> (cyclops)
         # ms5 -> Respuesta: <type>;<pressure>;<temp>;<depth>;<altitude>
         # temp -> Respuesta: <type>;<measure> (i2c sensors)
+        # (v3) ce -> Respuesta: <type>;<addr>;<value> (sdi-12 sensor)
 
         #msg2send = "ms5"
         #sock.sendto(msg2send.encode(), arduino)
@@ -139,13 +157,52 @@ if __name__ == "__main__":
             print("Error. No hay respuesta de Temp2.")
             #pass
 
+        if not version == "v3":
+            ce_read = True
+            msg2send = "temp"
+            sock.sendto(msg2send.encode(), arduino)
+            try:
+                recv_d, addr = sock.recvfrom(buffersize)
+                data = recv_d.decode().split(";")
+                temp2 = data[1]
+
+                print(f"[Temp] temp2:{temp2}")
+
+                # Save OK
+                temp_read = True
+                
+            except:
+                temp_read = False
+                print("Error. No response for temp2.")
+                pass
+        else:
+            temp_read = True
+            msg2send = "ce"
+            sock.sendto(msg2send.encode(), arduino)
+            try:
+                recv_d, addr = sock.recvfrom(buffersize)
+                data = recv_d.decode().split(";")
+                addr = data[1]
+                ce = data[2]
+
+                print(f"[CE] Sensor address:{addr}, ce: {ce}")
+
+                # Save OK
+                ce_read = True
+            except:
+                ce_read = False
+                print("Error. No response for ce.")
+                pass
+
         # Terminamos, guardamos en el CSV
-        if (cdom_read and phy_read and chl_read and temp_read):
+        if (cdom_read and phy_read and chl_read and temp_read and ce_read):
             time = datetime.today().strftime("%H:%M:%S")
 
             # Preparing the row
-            row = [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb,
-                   cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
+            if version == "v3":
+                row =  [station, time, depth, temp1, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv, ce]
+            else:
+                row =  [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
             
             # Write to CSV
             with open(filename, 'a', newline='') as f:
