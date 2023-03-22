@@ -4,10 +4,20 @@
 A CTD device’s primary function is to detect how the conductivity and temperature of the water column changes relative to depth.
 This CTD obtain the values of colored dissolved organic matter (CDOM), Phycoerythrin (PE) and Chlorophyll (CHL).
 
-### Based on:
-Currently using a master-slave communication. An Arduino is doing the slave, and the mastering task its doing for other devices, like phone or laptop.
+## Requirements
 
-#### Arduino (v2)
+* `GIT`
+* `Python`
+* _Optional_ Use Shell Script to execute the associated software (view folder `shell`).
+
+### Based on:
+Designed using a master-slave communication. An Arduino is doing the slave, and the mastering role is doing by other devices, like a phone or a laptop.
+
+#### Probe (v3)
+
+* Go to folder `v3` in order to view the specific documentation for that version!
+
+#### Probe (v2)
 <img src="https://user-images.githubusercontent.com/30501761/107502491-02701400-6b99-11eb-85ca-b9cfb308657b.jpg" width="800" height="600">
 
 * Arduino UNO
@@ -22,6 +32,8 @@ Powering the Arduino with Ethernet PoE, and connecting it to a Router. The Route
 
 ##### Programs
 Using a python based program to ask the CTD all values sensors, saving to a CSV and live plotting all the received values.
+
+* View folder `CTD_controller`.
 
 ### Used sensors:
 * [Turner Cyclops-7F CDOM](https://www.turnerdesigns.com/cyclops-7f-submersible-fluorometer)

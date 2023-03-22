@@ -31,3 +31,10 @@
 ## Connector for ES-2 Sensor
 
 ![Pinout ES-2 Connector](docs/pinout_connector_es2.png)
+
+## Deploy notes
+
+* Yellow Router USB cable could be connect to power brick (example: mobile phone charger). There isnt data flowing in that USB, only power.
+* Yellow Router IP: 10.0.1.1, using OpenWRT. Password: _the classic ones_
+* The Probe has Static IP (10.0.1.10), forced by the router.
+* The Router expose the WiFi called `Boat`. Its able to use and should connect OK with the probe.

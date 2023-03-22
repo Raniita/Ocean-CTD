@@ -2,4 +2,4 @@
 
 
 ### Source
-Based on project (source)[https://www.theeminentcodfish.com/gopro-timestamp/]
+Based on project [source](https://www.theeminentcodfish.com/gopro-timestamp/)
