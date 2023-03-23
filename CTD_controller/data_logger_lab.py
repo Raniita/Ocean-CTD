@@ -7,6 +7,8 @@ from datetime import datetime
 import socket, time, csv
 import gpsd
 
+import salinity
+
 # Plot
 def live_plot(filename, station):
     """ Threaded func to get the CSV data and plotting it """
@@ -28,13 +30,16 @@ def live_plot(filename, station):
             last_chl = str(y3_values.iloc[-1])
             y4_values = data['ce [uS/cm]']
             last_ce = str(y4_values.iloc[-1])
+            y5_values = data['s [pps]']
+            last_s = str(y5_values.iloc[-1])
 
             # Fix first row csv, empty values
             if(last_cdom == "cdom [ppb]"):
                 last_cdom = "none"
                 last_phy = "none"
                 last_chl = "none"
-                las_ce = "none"
+                last_ce = "none"
+                last_s = "none"
 
             # Limit the data
             imin = min(max(0, i - win), x_values.size - win)
@@ -49,6 +54,8 @@ def live_plot(filename, station):
             plt.plot([],[], ' ', label="CHL: "+last_chl)
             plt.scatter(0,0, color="red", label="ce [uS/cm]")
             plt.plot([],[], ' ', label="CE: "+last_ce)
+            plt.scatter(0,0, color="yellow", label="s [pps]")
+            plt.plot([],[], ' ', label="S: "+last_s)
             plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
         except pd.errors.EmptyDataError:
             print (filename, " is empty")
@@ -105,7 +112,7 @@ if __name__ == '__main__':
 
         with open(filename, 'a', newline='') as f:
             if version == "v3":
-                row = ["station","latitude", "longitude", "time", "depth", "temp1", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]", "ce [uS/cm]"]
+                row = ["station","latitude", "longitude", "time", "depth", "temp1", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]", "ce [uS/cm]", "s [pps]"]
             else:
                 row = ["station","latitude", "longitude", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
             writer = csv.writer(f, delimiter=',')
@@ -116,7 +123,7 @@ if __name__ == '__main__':
     else:
         with open(filename, 'a', newline='') as f:
             if version == "v3":
-                row = ["station", "time", "depth", "temp1", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]", "ce [uS/cm]"]
+                row = ["station", "time", "depth", "temp1", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]", "ce [uS/cm]", "s [pps]"]
             else:
                 row = ["station", "time", "depth", "temp1", "temp2", "cdom [gain]", "cdom [ppb]", "cdom [mv]", "pe [gain]", "pe [ppb]", "pe [mv]", "chl [gain]", "chl [ppb]", "chl [mv]"]
             writer = csv.writer(f, delimiter=',')
@@ -261,12 +268,14 @@ if __name__ == '__main__':
                 #position = gpsd.get_current().position()
                 print(f"[GPS] Lattitude:{position[0]} Longitude:{position[1]}")
                 if version == "v3":
-                    row =  [station, position[0], position[1], time, depth, temp1, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv, ce]
+                    s = round(salinity.get_salinity(temperature=temp1,depth=depth, ce=ce), 4)
+                    row =  [station, position[0], position[1], time, depth, temp1, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv, ce, s]
                 else:
                     row =  [station, position[0], position[1], time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
             else:
                 if version == "v3":
-                    row =  [station, time, depth, temp1, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv, ce]
+                    s = round(salinity.get_salinity(temperature=temp1,depth=depth, ce=ce), 4)
+                    row =  [station, time, depth, temp1, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv, ce, s]
                 else:
                     row =  [station, time, depth, temp1, temp2, cdom_gain, cdom_ppb, cdom_mv, phy_gain, phy_ppb, phy_mv, chl_gain, chl_ppb, chl_mv]
 

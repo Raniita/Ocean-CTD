@@ -38,7 +38,8 @@ def live_plot(filename, station):
                 last_cdom = "none"
                 last_phy = "none"
                 last_chl = "none"
-                las_ce = "none"
+                last_ce = "none"
+                last_s = "none"
 
             # Limit the data
             imin = min(max(0, i - win), y_values.size - win)
@@ -76,7 +77,7 @@ def live_plot(filename, station):
     
 if __name__ == '__main__':
     # Arduino IP + port [10.0.1.10 DHCP del barco]
-    arduino = ('localhost', 55055)
+    arduino = ('10.0.1.10', 55055)
     buffersize = 1024
 
     # UPD Socket
